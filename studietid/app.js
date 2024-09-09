@@ -1,7 +1,26 @@
 const sqlite3 = require('better-sqlite3')
+const path = require('path')
 const db = sqlite3('./studietid.db', {verbose: console.log})
+const express = require('express')
+const app = express()
+
+const staticPath = path.join(__dirname, 'public')
 
 
+app.get('/', (req, resp) => {
+    resp.sendFile(path.join(staticPath, 'app.html'))
+})
+
+
+app.get('/getusers/', (req, res) =>{
+    let sql = db.prepare(`
+        SELECT user.id as userid, firstname, lastname, email, role.name as role 
+        FROM user inner join role on user.idrole = role.id `);
+    let users = sql.all()
+    console.log("users.length",users.length)
+    
+    res.send(users)
+})
 //let result = addUser("fname", "lnam", 1, 1, "mo@amal")
 //deleted = deleteUser('mo@amal')
 //let activ = regActivity(63, getFormattedDate(), 3, 2, 2)
@@ -17,7 +36,7 @@ function addUser(firstName, lastName, idRole, isAdmin, email)
             SELECT user.id as userid, firstname, lastname, email, role.name as role 
             FROM user inner join role on user.idrole = role.id 
             WHERE user.id  = ?`);
-        let rows = sql.all(info.lastInsertRowid)  
+        let rows = sql.all(info.lastInsertRowid)
         console.log("rows.length",rows)
         return rows[0]
     }
@@ -59,3 +78,7 @@ function confirmingActivity(yes, duration, idUser, startTime,  idStatus){
 }
 confirmingActivity(3, 60, 3, '2024-09-05 07:13:56', 2)
 
+app.use(express.static(staticPath));
+app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000')
+})
