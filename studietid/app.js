@@ -46,44 +46,48 @@ function addUser(firstName, lastName, idRole, isAdmin, email)
     
 }
 
-function eMailCheck(email) {
-    return false
-    if(email.includes('@')) {
+function checkValidEmail(email) {
+    let re = RegExp('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
+    if (!re.test(email)) {
+        return true
+    } else {return false}
+    /*if(email.includes('@')) {
         let sql=db.prepare(`SELECT user.id FROM USER WHERE email = ?`);
         const info = sql.get(email)
         console.log('infolop:', info)
         //res.redirect('/app.html?errorMsg=Email already exists.')
         return info
-    } else {return true}
+    } else {return true}*/
+}
+//"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+function emailExists(email) {
+    let sql=db.prepare(`SELECT user.id FROM USER WHERE email = ?`);
+    const info = sql.get(email)
+    console.log('infolop:', info)
+    return info
 }
 
 
-
-
-
-
 app.post('/adduser/', (req, res) => {
-    console.log('5th')
+    
     const { firstName, lastName, idRole, isAdmin, email } = req.body;
-    if (eMailCheck(email)) { 
-        return res.json({ error: 'Email already exists.' }); 
+    if (checkValidEmail(email)) {
+        return res.json({ error: 'Email invalid' }); 
     }
-    console.log('6th')
+    if (emailExists(email)) {
+        return res.json({ error: 'Email already exists' });
+    }
     // Insert new user 
     
     const newUser = addUser(firstName, lastName, 2, 0, email);
-    console.log('HEI' + newUser)
+    
     if (!newUser) { 
         //return res.json
         console.log({ error: 'Failed to register user.' }); 
-        return 1
+        return res.json({ error: 'Failed to register user.' });
+        
     }
     console.log({ message: 'User registered successfully!', user: newUser }); 
-    console.log('7th')
-    
-    if (!newUser) {
-        return res.json({ error: 'Failed to register user.' });
-    }
 
     res.sendFile(path.join(staticPath, 'app.html'))
 });

@@ -8,12 +8,8 @@ async function fetchUsers(){
     try {
         let response = await fetch('/getusers/');
         let data = await response.json();
-        console.log(2+ data);
         randPpl(data);
-        /*for (let i= 0 ; i < data.length; i++){
-            
-            randPpl(data[i]);
-        }*/
+        
     } catch (error) {
         console.error('Ereror', error);
     }
@@ -138,6 +134,6 @@ function randPpl(info) {
         }
         persons.push(person);
         displayPersons();
-    } console.log(1+ persons)
+    } 
     
 }
