@@ -1,14 +1,19 @@
+
 fetchUsers()
 
+const params = new URLSearchParams(window.location.search);
+const errorMsg = params.get('errorMsg');
+console.log(errorMsg);
 async function fetchUsers(){
     try {
         let response = await fetch('/getusers/');
         let data = await response.json();
-        console.log(data);
-        
-        for (let i= 0 ; i < data.length; i++){
-            console.log(data[i]);
-        }
+        console.log(2+ data);
+        randPpl(data);
+        /*for (let i= 0 ; i < data.length; i++){
+            
+            randPpl(data[i]);
+        }*/
     } catch (error) {
         console.error('Ereror', error);
     }
@@ -16,66 +21,93 @@ async function fetchUsers(){
 
 
 
+const regForm = document.getElementById('registerForm') 
+//regForm.addEventListener('submit', adduser) 
+async function adduser(event) {
+    event.preventDefault(); 
+    const user = { 
+        firstName: regForm.firstName.value,
+        lastName: regForm.lastName.value, 
+        idRole: 2, isAdmin: 0, 
+        email: regForm.email.value 
+    }; 
+    console.log(user);
+        try { 
+            const response = await fetch('/adduser/', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(user) 
+            }); 
+
+            const data = await response.json(); 
+            fetchUsers();
+            //persons = []
+            randPpl();
+            if (data.error) { 
+                document.getElementById('error').innerText = data.error; 
+                document.getElementById('success').innerText = 'sum went wrong'; } 
+                else { 
+                    document.getElementById('error').innerText = ''; 
+                    document.getElementById('success').innerText = 'Bruker registrert.'; }
+            } catch (error) { 
+                    document.getElementById('error').innerText = 'En feil oppstod. Vennligst prøv igjen.'; 
+                    console.error('Errore:', error); 
+                } 
+            } 
+
 
 
 
 // Eksempel på en liste med personer
-/*let persons = [
+let persons = [
     {
-        "name": "Ola Nordmann",
-        "age": 30,
+        "firstName": "Ola ",
+        "lastName": " Nordmann",
+        "idRole": 0,
+        "isAdmin": 0,
         "email": "ola@example.com",
     },
     {
-        "name": "1Kari Nordmann",
-        "age": 25,
+
+        "firstName": "1Kari ",
+        "lastName": " Nordmann",
+        "idRole": 0,
+        "isAdmin": 0,
         "email": "kari@example.com",
     }
 ];
-/*
 
-function sorts() {
-    let x = document.getElementById("skob").value
-    if (x=="name") {
-        persons.sort(function(a, b){
-            if(a.name < b.name) { return -1; }
-            if(a.name > b.name) { return 1; }
-            return 0;
-        })
-    } else if (x=="age") {
-        persons.sort(function(a, b){return a.age - b.age})
-    } else if (x=="email") {
-        persons.sort(function(a, b){
-            if(a.email < b.email) { return -1; }
-            if(a.email > b.email) { return 1; }
-            return 0;
-        })
-    }
-    displayPersons();
-}
+
+
 
 
 
 
 let idVar = 0
-//document.getElementById('addPersonBtn').addEventListener('click', addPerson);
-fetchRandomUsers()
 const personList = document.getElementById('personList');
 // Funksjon for å vise listen med personer på nettsiden
 function displayPersons() {
+
     idVar=0
+    
     personList.innerHTML = `
     <tr>
-        <th>Name</th>
-        <th>Age</th>
+        <th>firstName</th>
+        <th>lastName</th>
+        <th>idRole</th>
+        <th>isAdmin</th>
         <th>Email</th>
-    </tr>`; // Tøm listen først
+    </tr>
+    `; // Tøm listen først
     //persons.sort(function(a, b){return a.age - b.age})
     
     persons.forEach(person => {
         personList.innerHTML +=
-        `<tr oncontextmenu="contextMenu(this.id)" id="${idVar}"><td>${person.name}</td>
-        <td>${person.age} år</td>
+        `<tr oncontextmenu="contextMenu(this.id)" id="${idVar}">
+        <td>${person.firstName}</td>
+        <td>${person.lastName}</td>
+        <td>${person.idRole}</td>
+        <td>${person.isAdmin}</td>
         <td>Email: ${person.email}</td>
         </tr>`;
         idVar++;
@@ -83,75 +115,29 @@ function displayPersons() {
     
 }
 
-// Funksjon for å legge til en ny person til listen
-function addPerson() {
-    const newPerson = {
-        "name": document.getElementById("name").value,
-        "age": document.getElementById("age").value,
-        "email": document.getElementById("email").value,
-        "id": idVar
-    };
-    document.getElementById("email").value = ""
-    document.getElementById("name").value = ""
-    document.getElementById("age").value = ""
-    idVar++;
-    persons.push(newPerson);
-    sorts() // Oppdater visningen
-}
-
 
 
 // Kall funksjonen for å vise listen med en gang siden lastes
 displayPersons();
-const menu = document.getElementById("menu")
-function contextMenu(id){
-    
-    menu.innerHTML =`
-        <button id="${id}" onclick="remove(${id})">delet</button>
-        <button id="${id}" onclick="edit(${id})">edit</button>`
-    menu.style.display="block"
-    menu.style.top=(`${event.clientY}px`)
-    menu.style.left=(`${event.clientX}px`)
-    
-}
+
 function remove(id) {
     persons.splice(id, 1);
     displayPersons();
 }
-function edit(id) {
-    document.getElementById("name").value = persons[id].name
-    document.getElementById("age").value = persons[id].age
-    document.getElementById("email").value = persons[id].email
-    remove(id);
-}
-document.body.addEventListener("click", function(){
-    menu.style.display = "none";
-})
 
-
-// Funksjon for å hente tilfeldige brukere fra Random User API
-
-    async function fetchRandomUsers() {
-        try {
-            // Fetch API brukes for å hente data fra URLen
-            let response = await fetch('https://randomuser.me/api/?results=8'); // Henter 5 tilfeldige brukere
-            let data = await response.json(); // Konverterer responsen til JSON
-            console.log(data); // Logger hentet data for testing
-            //let gender=data.results[0].gender
-            //document.getElementById("thingy").innerHTML = gender
-            randPpl(data)
-        } catch (error) {
-            console.error('Error:', error); // Håndterer eventuelle feil
-        }
-    }
     
 function randPpl(info) {
-    for (let i=0; i<info.results.length; i++) {
-        persons.push(info)
-        document.getElementById("name").value = info.results[i].name.first + " " + info.results[i].name.last
-        document.getElementById("age").value = info.results[i].dob.age
-        document.getElementById("email").value = info.results[i].email
-        addPerson();
-    }
-    let gender=info.results[0].gender
-}*/
+    for (let i=0; i<info.length; i++) {
+        console.log(info[i]);
+        let person = {
+            "firstName": info[i].firstName,
+            "lastName": info[i].lastName,
+            "idRole": info[i].idRole,
+            "isAdmin": info[i].isAdmin,
+            "email": info[i].email,
+        }
+        persons.push(person);
+        displayPersons();
+    } console.log(1+ persons)
+    
+}
