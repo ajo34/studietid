@@ -17,6 +17,8 @@ async function fetchUsers(){
 
 
 
+
+
 const regForm = document.getElementById('registerForm') 
 //regForm.addEventListener('submit', adduser) 
 async function adduser(event) {
@@ -24,7 +26,8 @@ async function adduser(event) {
     const user = { 
         firstName: regForm.firstName.value,
         lastName: regForm.lastName.value, 
-        idRole: 2, isAdmin: 0, 
+        idRole: 2, 
+        isAdmin: 0, 
         email: regForm.email.value 
     }; 
     console.log(user);
@@ -36,9 +39,7 @@ async function adduser(event) {
             }); 
 
             const data = await response.json(); 
-            fetchUsers();
-            //persons = []
-            randPpl();
+            
             if (data.error) { 
                 document.getElementById('error').innerText = data.error; 
                 document.getElementById('success').innerText = 'sum went wrong'; } 
@@ -85,13 +86,11 @@ const personList = document.getElementById('personList');
 function displayPersons() {
 
     idVar=0
-    
     personList.innerHTML = `
     <tr>
-        <th>firstName</th>
-        <th>lastName</th>
-        <th>idRole</th>
-        <th>isAdmin</th>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Role</th>
         <th>Email</th>
     </tr>
     `; // Tøm listen først
@@ -99,12 +98,11 @@ function displayPersons() {
     
     persons.forEach(person => {
         personList.innerHTML +=
-        `<tr oncontextmenu="contextMenu(this.id)" id="${idVar}">
+        `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
         <td>${person.firstName}</td>
         <td>${person.lastName}</td>
         <td>${person.idRole}</td>
-        <td>${person.isAdmin}</td>
-        <td>Email: ${person.email}</td>
+        <td>${person.email}</td>
         </tr>`;
         idVar++;
     })
@@ -116,19 +114,17 @@ function displayPersons() {
 // Kall funksjonen for å vise listen med en gang siden lastes
 displayPersons();
 
-function remove(id) {
-    persons.splice(id, 1);
-    displayPersons();
-}
+
 
     
 function randPpl(info) {
+    persons = []
     for (let i=0; i<info.length; i++) {
         console.log(info[i]);
         let person = {
             "firstName": info[i].firstName,
             "lastName": info[i].lastName,
-            "idRole": info[i].idRole,
+            "idRole": info[i].role,
             "isAdmin": info[i].isAdmin,
             "email": info[i].email,
         }
@@ -136,4 +132,47 @@ function randPpl(info) {
         displayPersons();
     } 
     
+}
+const menu = document.getElementById("menu")
+document.body.addEventListener("click", function(){
+    menu.style.display = "none";})
+function contextMenu(id){
+    
+    menu.innerHTML =`
+        <button id="${id}" onclick="removeuser(${id})">delet</button>
+        <button id="${id}" onclick="edit(${id})">edit</button>`
+    menu.style.display="block"
+    menu.style.top=(`${event.clientY}px`)
+    menu.style.left=(`${event.clientX}px`)
+    
+}
+function edit(id) {
+    document.getElementById("name").value = persons[id].name
+    document.getElementById("age").value = persons[id].age
+    document.getElementById("email").value = persons[id].email
+    remove(id);
+}
+
+async function removeuser(id) {
+    const user = persons[id]
+    console.log('email to be deleted: ' + user.email);
+        try { 
+            const response = await fetch('/removeuser/', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(user) 
+            })
+            const data = await response.json(); 
+            
+
+        } catch (error) {
+            document.getElementById('error').innerText = error; 
+            document.getElementById('success').innerText = 'sum went wrong wit removing';
+        }
+        fetchUsers()
+    }
+
+function remove(id) {
+    persons.splice(id, 1);
+    displayPersons();
 }

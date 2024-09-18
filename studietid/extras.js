@@ -29,6 +29,15 @@ function confirmingActivity(yes, duration, idUser, startTime,  idStatus){
 //let activ = regActivity(63, getFormattedDate(), 3, 2, 2)
 //console.log(getFormattedDate())
 
+/*if(email.includes('@')) {
+    let sql=db.prepare(`SELECT user.id FROM USER WHERE email = ?`);
+    const info = sql.get(email)
+    console.log('infolop:', info)
+    //res.redirect('/app.html?errorMsg=Email already exists.')
+    return info
+} else {return true}*/
+//"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+
 
 
 
@@ -59,29 +68,43 @@ function confirmingActivity(yes, duration, idUser, startTime,  idStatus){
 
 
 
-/*const menu = document.getElementById("menu")
-function contextMenu(id){
-    
-    menu.innerHTML =`
-        <button id="${id}" onclick="remove(${id})">delet</button>
-        <button id="${id}" onclick="edit(${id})">edit</button>`
-    menu.style.display="block"
-    menu.style.top=(`${event.clientY}px`)
-    menu.style.left=(`${event.clientX}px`)
-    
-}*/
+/*
+*/
 
 
-/*function edit(id) {
-    document.getElementById("name").value = persons[id].name
-    document.getElementById("age").value = persons[id].age
-    document.getElementById("email").value = persons[id].email
-    remove(id);
-}
-document.body.addEventListener("click", function(){
-    menu.style.display = "none";
+/*
+
 })
 
 
 
     }*/
+
+
+
+
+
+
+
+const enterBtn = document.getElementById('enter');
+enterBtn.addEventListener('click', async () => {
+    try {
+        const response = await fetch('/enter/', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(persons) 
+        }); 
+    } catch (error) {
+        document.getElementById('error').innerText = 1+ error; 
+        document.getElementById('success').innerText = 'sum went wrong'; 
+        }
+})
+
+
+app.post('/enter/'), (req, res) => {
+    //res.sendFile(path.join(staticPath, 'eirikPage.html'));
+    //return res.json({ error: 'Failed to register user.' });
+}
+
+
+<button id="enter">Enter</button>

@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>StudieTid</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>exp</h1>
-    <table id="personList"><p>skibidi</p></table>
+    <h1>StudieTid</h1>
+    <table id="personList"></table>
     <div class="container">
-        <h2>Registrer</h2>
+        <h2>Register</h2>
         <form id="registerForm" name="registerForm" action="adduser" method="POST">
-            <input type="text" name="firstName" id="firstName" placeholder="Fornavn" required>
-            <input type="text" name="lastName" id="lastName" placeholder="Etternavn" required>
+            <input type="text" name="firstName" id="firstName" placeholder="First name" required>
+            <input type="text" name="lastName" id="lastName" placeholder="Last name" required>
             <input type="text" name="email" id="email" placeholder="Email" required>
+            <br>
             <button type="submit">Register</button>
         </form>
+        
         <p id="error"></p>
         <p id="success"></p>
     </div>
+    <div id="menu">a</div>
 
 
 
