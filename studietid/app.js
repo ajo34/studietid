@@ -25,6 +25,17 @@ app.get('/getusers/', (req, res) =>{
     
 })
 
+app.get('/getactivities/', (req, res) =>{
+    let sql = db.prepare(`
+        SELECT idUser, startTime, subject.name as subject, room.name as room, status.name as status, duration
+        from activity inner join subject on activity.idsubject = subject.id, room on activity.idroom = room.id, status on activity.idstatus = status.id`)
+    let activities = sql.all()
+    console.log("activities.length",activities.length)
+    
+    res.send(activities)
+    
+})
+
 function addUser(firstName, lastName, idRole, isAdmin, email){
     
     
@@ -102,9 +113,45 @@ app.post('/removeuser', (req, res) => {
     console.log("id", email)
 
     deleteUser(email);
+    res.sendFile(path.join(staticPath, 'index.html'))
 })
 
 app.use(express.static(staticPath));
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000')
+})
+
+
+
+function getFormattedDate() {
+    return new Date().toISOString().replace('T', ' ').slice(0, 19);
+}
+
+function regActivity(idUser, startTime, idSubject, idRoom, idStatus){
+    let sql = db.prepare(`INSERT INTO activity (idUser, startTime, idSubject, idRoom, idStatus)
+                        values (?, ?, ?, ?, ?)`)
+    const info = sql.run(idUser, startTime, idSubject, idRoom, idStatus)
+    console.log(info)
+
+}
+
+app.post('/regactivity/', (req, res) => {
+    const { idUser, startTime, idSubject, idRoom, idStatus } = req.body
+
+    regActivity(1, 1, idSubject, idRoom, 0)
+    res.sendFile(path.join(staticPath, 'index.html'))
+})
+
+
+
+
+app.get('/getsubjectroom/', (req, res) =>{
+    let sql = db.prepare(`
+        SELECT subject.name as subject, room.name as room
+        FROM subject inner join room on subject.id = room.id `);
+    let thingies = sql.all()
+    console.log("thingies.length",thingies.length)
+    
+    res.send(thingies)
+    
 })

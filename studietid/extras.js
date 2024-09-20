@@ -8,16 +8,7 @@ function deleteUser(email){
     sql=db.prepare(`DELETE FROM USER WHERE email = ?`);
     info = sql.run(email)
 }
-function getFormattedDate() {
-    return new Date().toISOString().replace('T', ' ').slice(0, 19);
-}
 
-function regActivity(idUser, startTime, idSubject, idRoom, idStatus){
-    let sql = db.prepare(`INSERT INTO activity (idUser, startTime, idSubject, idRoom, idStatus)
-                        values (?, ?, ?, ?, ?)`)
-    const info = sql.run(idUser, startTime, idSubject, idRoom, idStatus)
-    console.log(info)
-}
 function confirmingActivity(yes, duration, idUser, startTime,  idStatus){
     let sql = db.prepare(`UPDATE activity SET idStatus = ?, duration = ? WHERE idUser = ? AND startTime = ? AND idStatus = ?`)
     const info = sql.run(yes, duration, idUser, startTime,  idStatus)
@@ -39,7 +30,10 @@ function confirmingActivity(yes, duration, idUser, startTime,  idStatus){
 //"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 
 
-
+function remove(id) {
+    persons.splice(id, 1);
+    displayPersons();
+}
 
 
 
