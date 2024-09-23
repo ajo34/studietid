@@ -11,7 +11,7 @@
     <table id="personList"></table>
     <div class="container">
         <h2>Register</h2>
-        <form id="registerForm" name="registerForm" action="adduser" method="POST">
+        <form id="registerForm" name="registerForm" action="/adduser" method="POST">
             <input type="text" name="firstName" id="firstName" placeholder="First name" required>
             <input type="text" name="lastName" id="lastName" placeholder="Last name" required>
             <input type="text" name="email" id="email" placeholder="Email" required>
@@ -22,9 +22,9 @@
         <p id="success"></p>
     </div>
     <div id="activityContainer">
-        <form id="activityForm" name="activityForm" action="regactivity" method="POST">
-            <select id="roomSelect"></select>
-            <select id="subjectSelect"></select>
+        <form id="activityForm" name="activityForm" action="/regactivity" method="POST">
+            <select name="idRoom" id="roomSelect"></select>
+            <select name="idSubject" id="subjectSelect"></select>
             <br>
             <button type="submit">Register</button>
         </form>

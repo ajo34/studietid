@@ -72,14 +72,16 @@ function emailExists(email) {
 }
 
 
-app.post('/adduser/', (req, res) => {
+app.post('/adduser', (req, res) => {
     
     const { firstName, lastName, idRole, isAdmin, email } = req.body;
     if (checkValidEmail(email)) {
         return res.json({ error: 'Email invalid' }); 
     }
     if (emailExists(email)) {
-        return res.json({ error: 'Email already exists' });
+        res.redirect(`/index.html?errorMsg=EmailExists.`)
+        return res('Email already exists')
+        //return res.json({ error: 'Email already exists' });
     }
     // Insert new user 
     
@@ -124,22 +126,26 @@ app.listen(3000, () => {
 
 
 function getFormattedDate() {
-    return new Date().toISOString().replace('T', ' ').slice(0, 19);
+    const date = new Date();
+    date.setHours(date.getHours() + 2);
+    const formattedDate = date.toISOString().replace('T', ' ').slice(0, 19);
+    return formattedDate;
 }
 
-function regActivity(idUser, startTime, idSubject, idRoom, idStatus){
-    let sql = db.prepare(`INSERT INTO activity (idUser, startTime, idSubject, idRoom, idStatus)
-                        values (?, ?, ?, ?, ?)`)
-    const info = sql.run(idUser, startTime, idSubject, idRoom, idStatus)
+function regActivity(idUser, startTime, idSubject, idRoom, idStatus, duration){
+    let sql = db.prepare(`INSERT INTO activity (idUser, startTime, idSubject, idRoom, idStatus, duration)
+                        values (?, ?, ?, ?, ?, ?)`)
+    const info = sql.run(idUser, startTime, idSubject, idRoom, idStatus, duration)
     console.log(info)
 
 }
 
-app.post('/regactivity/', (req, res) => {
+app.post('/regactivity', (req, res) => {
     const { idUser, startTime, idSubject, idRoom, idStatus } = req.body
-
-    regActivity(1, 1, idSubject, idRoom, 0)
+    console.log('test')
+    regActivity(1, getFormattedDate(), Number(idSubject), Number(idRoom), 2, 60)
     res.sendFile(path.join(staticPath, 'index.html'))
+    
 })
 
 
@@ -147,7 +153,7 @@ app.post('/regactivity/', (req, res) => {
 
 app.get('/getsubjectroom/', (req, res) =>{
     let sql = db.prepare(`
-        SELECT subject.name as subject, room.name as room
+        SELECT subject.name as subject, subject.id as idSubject, room.id as idRoom, room.name as room
         FROM subject inner join room on subject.id = room.id `);
     let thingies = sql.all()
     console.log("thingies.length",thingies.length)

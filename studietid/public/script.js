@@ -10,7 +10,7 @@ async function fetchUsers(){
     try {
         let response = await fetch('/getusers/');
         let data = await response.json();
-        randPpl(data);
+        displayPersons(data);
         
     } catch (error) {
         console.error('Ereror', error);
@@ -21,7 +21,7 @@ async function fetchActivities(){
         let response = await fetch('/getactivities/');
         let data = await response.json();
         console.log(data)
-        randActv(data);
+        displayActivities(data);
         
     } catch (error) {
         console.error('Ereror', error);
@@ -45,49 +45,17 @@ function subRom(data){
     for (let i = 0; i < data.length; i++) {
     const rOption = document.createElement('option')
     rOption.textContent = data[i].room
+    rOption.value=data[i].idRoom
     roomSelect.appendChild(rOption)
 
     const sOption = document.createElement('option')
     sOption.textContent = data[i].subject
+    sOption.value=data[i].idSubject
     subjectSelect.appendChild(sOption)
     }
 
 }
 
-
-
-const regForm = document.getElementById('registerForm') 
-//regForm.addEventListener('submit', adduser) 
-/*async function adduser(event) {
-    event.preventDefault(); 
-    const user = { 
-        firstName: regForm.firstName.value,
-        lastName: regForm.lastName.value, 
-        idRole: 2, 
-        isAdmin: 0, 
-        email: regForm.email.value 
-    }; 
-    console.log(user);
-        try { 
-            const response = await fetch('/adduser/', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify(user) 
-            }); 
-
-            const data = await response.json(); 
-            
-            if (data.error) { 
-                document.getElementById('error').innerText = data.error; 
-                document.getElementById('success').innerText = 'sum went wrong'; } 
-                else { 
-                    document.getElementById('error').innerText = ''; 
-                    document.getElementById('success').innerText = 'Bruker registrert.'; }
-            } catch (error) { 
-                    document.getElementById('error').innerText = 'En feil oppstod. Vennligst prøv igjen.'; 
-                    console.error('Errore:', error); 
-                } 
-            } */
 
 
 
@@ -137,7 +105,7 @@ let activities = [
 
 const personList = document.getElementById('personList');
 // Funksjon for å vise listen med personer på nettsiden
-function displayPersons() {
+function displayPersons(persons) {
     let idVar = 0
 
     
@@ -156,7 +124,7 @@ function displayPersons() {
         `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
         <td>${person.firstName}</td>
         <td>${person.lastName}</td>
-        <td>${person.idRole}</td>
+        <td>${person.role}</td>
         <td>${person.email}</td>
         </tr>`;
         idVar++;
@@ -164,7 +132,21 @@ function displayPersons() {
     
 }
 const activityList = document.getElementById('activityList');
-function displayActivities() {
+function displayActivities(activities) {
+    /*activities = []
+    for (let i=0; i<info.length; i++) {
+        console.log(info[i]);
+        let activity = {
+            "idUser": info[i].idUser,
+            "startTime": info[i].startTime,
+            "subject": info[i].subject,
+            "room": info[i].room,
+            "status": info[i].status,
+            "duration": info[i].duration,
+        }
+        activities.push(activity);
+        
+    }*/
     let idVar = 0
 
     
@@ -197,26 +179,10 @@ function displayActivities() {
 
 // Kall funksjonene for å vise listen med en gang siden lastes
 displayPersons();
-displayActivities();
+//displayActivities();
 
 
-function randActv(info) {
-    activities = []
-    for (let i=0; i<info.length; i++) {
-        console.log(info[i]);
-        let activity = {
-            "idUser": info[i].idUser,
-            "startTime": info[i].startTime,
-            "subject": info[i].subject,
-            "room": info[i].room,
-            "status": info[i].status,
-            "duration": info[i].duration,
-        }
-        activities.push(activity);
-        
-    }
-    displayActivities();
-}
+
 function randPpl(info) {
     persons = []
     for (let i=0; i<info.length; i++) {

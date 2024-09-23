@@ -102,3 +102,37 @@ app.post('/enter/'), (req, res) => {
 
 
 <button id="enter">Enter</button>
+
+
+/*const regForm = document.getElementById('registerForm') 
+//regForm.addEventListener('submit', adduser) 
+async function adduser(event) {
+    event.preventDefault(); 
+    const user = { 
+        firstName: regForm.firstName.value,
+        lastName: regForm.lastName.value, 
+        idRole: 2, 
+        isAdmin: 0, 
+        email: regForm.email.value 
+    }; 
+    console.log(user);
+        try { 
+            const response = await fetch('/adduser/', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(user) 
+            }); 
+
+            const data = await response.json(); 
+            
+            if (data.error) { 
+                document.getElementById('error').innerText = data.error; 
+                document.getElementById('success').innerText = 'sum went wrong'; } 
+                else { 
+                    document.getElementById('error').innerText = ''; 
+                    document.getElementById('success').innerText = 'Bruker registrert.'; }
+            } catch (error) { 
+                    document.getElementById('error').innerText = 'En feil oppstod. Vennligst prøv igjen.'; 
+                    console.error('Errore:', error); 
+                } 
+            } */
