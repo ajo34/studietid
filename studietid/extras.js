@@ -136,3 +136,43 @@ async function adduser(event) {
                     console.error('Errore:', error); 
                 } 
             } */
+
+
+
+displayPersons();
+//displayActivities();
+
+
+
+function randPpl(info) {
+    persons = []
+    for (let i=0; i<info.length; i++) {
+        console.log(info[i]);
+        let person = {
+            "firstName": info[i].firstName,
+            "lastName": info[i].lastName,
+            "idRole": info[i].role,
+            "isAdmin": info[i].isAdmin,
+            "email": info[i].email,
+        }
+        persons.push(person);
+        displayPersons();
+    } 
+    
+}
+
+
+/*activities = []
+    for (let i=0; i<info.length; i++) {
+        console.log(info[i]);
+        let activity = {
+            "idUser": info[i].idUser,
+            "startTime": info[i].startTime,
+            "subject": info[i].subject,
+            "room": info[i].room,
+            "status": info[i].status,
+            "duration": info[i].duration,
+        }
+        activities.push(activity);
+        
+    }*/

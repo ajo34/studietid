@@ -8,7 +8,8 @@
 </head>
 <body>
     <h1>StudieTid</h1>
-    <table id="personList"></table>
+    <a href="http://localhost:3000/admin/admin.html">Admin</a>
+    
     <div class="container">
         <h2>Register</h2>
         <form id="registerForm" name="registerForm" action="/adduser" method="POST">
@@ -24,11 +25,12 @@
     <div id="activityContainer">
         <form id="activityForm" name="activityForm" action="/regactivity" method="POST">
             <select name="idRoom" id="roomSelect"></select>
+            <br>
             <select name="idSubject" id="subjectSelect"></select>
             <br>
             <button type="submit">Register</button>
         </form>
-        <table id="activityList"></table>
+        
     </div>
     <div id="menu">a</div>
 

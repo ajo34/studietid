@@ -43,3 +43,14 @@ button {
 #menu > button {
     width: 100%;
 }
+
+select {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+#activityContainer {
+    background-color: rgb(25, 189, 112);
+    border: 10px solid white;
+}
