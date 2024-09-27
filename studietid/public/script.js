@@ -1,23 +1,13 @@
 
 fetchSubjectRoom()
-fetchActivities()
+
 const params = new URLSearchParams(window.location.search);
 const errorMsg = params.get('errorMsg');
 console.log(errorMsg);
 
 
 
-async function fetchActivities(){
-    try {
-        let response = await fetch('/getactivities/');
-        let data = await response.json();
-        console.log(data)
-        displayActivities(data);
-        
-    } catch (error) {
-        console.error('Ereror', error);
-    }
-}
+
 async function fetchSubjectRoom(){
     try {
         let response = await fetch('/getsubjectroom/');
@@ -47,7 +37,12 @@ function subRom(data){
 
 }
 
+document.getElementById('lightBtn').addEventListener('click',lightMode)
 
-
-
-
+function lightMode(){
+    console.log('lightMode')
+    const newLink = document.createElement('link')
+    newLink.rel = 'stylesheet'
+    newLink.href = 'light.css'
+    document.head.replaceChild(newLink, document.getElementById('styl'));
+}

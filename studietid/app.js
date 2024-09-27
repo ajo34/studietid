@@ -12,7 +12,9 @@ const staticPath = path.join(__dirname, 'public')
 app.get('/', (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'))
 })
-
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(staticPath, 'Admin/admin.html'))
+})
 
 app.get('/getusers/', (req, res) =>{
     let sql = db.prepare(`
@@ -118,10 +120,7 @@ app.post('/removeuser', (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'))
 })
 
-app.use(express.static(staticPath));
-app.listen(3000, () => {
-    console.log('Server is running on http://localhost:3000')
-})
+
 
 
 
@@ -160,4 +159,14 @@ app.get('/getsubjectroom/', (req, res) =>{
     
     res.send(thingies)
     
+})
+
+
+
+
+
+
+app.use(express.static(staticPath));
+app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000')
 })

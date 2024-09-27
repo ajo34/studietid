@@ -122,3 +122,7 @@ async function removeuser(id) {
             document.getElementById('success').innerText = 'sum went wrong wit removing';
         }
 }
+
+async function updateStatus(){
+    
+}
