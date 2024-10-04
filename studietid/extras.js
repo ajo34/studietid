@@ -36,8 +36,13 @@ function remove(id) {
 }
 
 
-
-
+function edit(id) {
+    document.getElementById("name").value = persons[id].name
+    document.getElementById("age").value = persons[id].age
+    document.getElementById("email").value = persons[id].email
+    remove(id);
+}
+<button id="${id}" onclick="edit(${id})">edit</button>
 
 
 /*function sorts() {
@@ -176,3 +181,69 @@ function randPpl(info) {
         activities.push(activity);
         
     }*/
+
+
+
+
+
+
+
+function displayActivities(activities) {
+    let idVar = 0
+
+    // Tøm listene først
+    uncheckedActivityList.innerHTML = `
+    <tr>
+        <th>idUser</th>
+        <th>startTime</th>
+        <th>subject</th>
+        <th>room</th>
+        <th>status</th>
+        <th>duration</th>
+    </tr>`; 
+    confirmedActivityList.innerHTML = `
+    <tr>
+        <th>idUser</th>
+        <th>startTime</th>
+        <th>subject</th>
+        <th>room</th>
+        <th>status</th>
+        <th>duration</th>
+    </tr>`;
+    deniedActivityList.innerHTML = `
+    <tr>
+        <th>idUser</th>
+        <th>startTime</th>
+        <th>subject</th>
+        <th>room</th>
+        <th>status</th>
+        <th>duration</th>
+    </tr>`;
+    
+    //persons.sort(function(a, b){return a.age - b.age})
+    console.log(activities)
+    activities.forEach(activity => {
+        if (activity.status == 'Ubekreftet') {
+            appendToRightActivityList(uncheckedActivityList, activity)
+        } else if (activity.status == 'Bekreftet') {
+            appendToRightActivityList(confirmedActivityList, activity)
+        } else if (activity.status == 'Annulert') {
+            appendToRightActivityList(deniedActivityList, activity)
+        }
+        
+        idVar++;
+    })
+}
+function appendToRightActivityList(activityList, activity ,idVar) {
+    console.log(activityList, activity)
+    activityList.innerHTML +=
+        `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
+        <td>${activity.idUser}</td>
+        <td>${activity.startTime}</td>
+        <td>${activity.subject}</td>
+        <td>${activity.room}</td>
+        <td>${activity.status}</td>
+        <td>${activity.duration}</td>
+        <td><button onclick="confirmActivity()">confirm</button></td>
+        </tr>`;
+}

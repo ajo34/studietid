@@ -1,9 +1,9 @@
 
 fetchSubjectRoom()
 
-const params = new URLSearchParams(window.location.search);
-const errorMsg = params.get('errorMsg');
-console.log(errorMsg);
+//const params = new URLSearchParams(window.location.search);
+//const errorMsg = params.get('errorMsg');
+//console.log(errorMsg);
 
 
 

@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'))
 })
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(staticPath, 'Admin/admin.html'))
+    res.sendFile(path.join(staticPath, '/admin/'))
 })
 
 app.get('/getusers/', (req, res) =>{
@@ -21,7 +21,7 @@ app.get('/getusers/', (req, res) =>{
         SELECT user.id as userid, firstname, lastname, email, role.name as role 
         FROM user inner join role on user.idrole = role.id `);
     let users = sql.all()
-    console.log("users.length",users.length)
+    
     
     res.send(users)
     
@@ -29,10 +29,10 @@ app.get('/getusers/', (req, res) =>{
 
 app.get('/getactivities/', (req, res) =>{
     let sql = db.prepare(`
-        SELECT idUser, startTime, subject.name as subject, room.name as room, status.name as status, duration
+        SELECT activity.id as idActivity, idUser, startTime, subject.name as subject, room.name as room, status.name as status, duration
         from activity inner join subject on activity.idsubject = subject.id, room on activity.idroom = room.id, status on activity.idstatus = status.id`)
     let activities = sql.all()
-    console.log("activities.length",activities.length)
+    
     
     res.send(activities)
     
@@ -148,14 +148,30 @@ app.post('/regactivity', (req, res) => {
 })
 
 
+function updateActivity(  idTeacher, idStatus, idActivity){
+    
+    let sql = db.prepare(`UPDATE activity set idTeacher = ?, idStatus = ? WHERE id = ?`)
+    const info = sql.run(idTeacher, idStatus, idActivity)
+    console.log(info)
+    if (info.changes !== 0) {
+        return 0
+    } else {
+        return { error: 'Failed to confirm activity.' }
+    }
+}
 
+app.post('/updateactivity', (req, res) => {
+    const {idTeacher, idStatus, idActivity} = req.body
+    updateActivity(idTeacher, idStatus, idActivity)
+    return res.send('Activity updated')
+})
 
 app.get('/getsubjectroom/', (req, res) =>{
     let sql = db.prepare(`
         SELECT subject.name as subject, subject.id as idSubject, room.id as idRoom, room.name as room
         FROM subject inner join room on subject.id = room.id `);
     let thingies = sql.all()
-    console.log("thingies.length",thingies.length)
+    
     
     res.send(thingies)
     

@@ -1,4 +1,5 @@
 
+
 fetchUsers()
 async function fetchUsers(){
     try {
@@ -40,72 +41,159 @@ function displayPersons(persons) {
     
 }
 
-const activityList = document.getElementById('activityList');
+
 fetchActivities()
 async function fetchActivities(){
     try {
         let response = await fetch('/getactivities/');
         let data = await response.json();
         console.log(data)
-        displayActivities(data);
+        activityListDisplayer(data); //Display activitylists
         
     } catch (error) {
         console.error('Ereror', error);
     }
 }
 
+//calls all display functions
+function activityListDisplayer(activities){
+    displayUncheckedActivityList(activities)
+    displayConfirmedActivities(activities)
+    displayDeniedActivities(activities)
+}
 
-function displayActivities(activities) {
+
+function displayUncheckedActivityList(activities) {
+    const activityList = document.getElementById('uncheckedActivityList');
     let idVar = 0
 
+    // Tøm listene først
     activityList.innerHTML = `
     <tr>
+        <th>idActivity</th>
         <th>idUser</th>
         <th>startTime</th>
         <th>subject</th>
         <th>room</th>
         <th>status</th>
         <th>duration</th>
-    </tr>
-    `; // Tøm listen først
+    </tr>`; 
+    
     //persons.sort(function(a, b){return a.age - b.age})
     console.log(activities)
     activities.forEach(activity => {
-        activityList.innerHTML +=
-        `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
-        <td>${activity.idUser}</td>
-        <td>${activity.startTime}</td>
-        <td>${activity.subject}</td>
-        <td>${activity.room}</td>
-        <td>${activity.status}</td>
-        <td>${activity.duration}</td>
-        </tr>`;
-        idVar++;
+        if (activity.status == 'Ubekreftet') {
+            activityList.innerHTML +=
+            `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
+            <td>${activity.idActivity}</td>
+            <td>${activity.idUser}</td>
+            <td>${activity.startTime}</td>
+            <td>${activity.subject}</td>
+            <td>${activity.room}</td>
+            <td>${activity.status}</td>
+            <td>${activity.duration}</td>
+            <td>
+                <button onclick="updateActivity(${activity.idActivity}, 3)">confirm</button>
+                <button onclick="updateActivity(${activity.idActivity}, 1)">deny</button>
+            </td>
+            </tr>`;
+            
+            idVar++;
+        }
     })
 }
 
+function displayConfirmedActivities(activities) {
+    const activityList = document.getElementById('confirmedActivityList');
+    let idVar = 0
+
+    // Tøm listene først
+    activityList.innerHTML = `
+    <tr>
+        <th>idActivity</th>
+        <th>idUser</th>
+        <th>startTime</th>
+        <th>subject</th>
+        <th>room</th>
+        <th>status</th>
+        <th>duration</th>
+    </tr>`; 
+    
+    //persons.sort(function(a, b){return a.age - b.age})
+    console.log(activities)
+    activities.forEach(activity => {
+        if (activity.status == 'Bekreftet') {
+            activityList.innerHTML +=
+            `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
+            <td>${activity.idActivity}</td>
+            <td>${activity.idUser}</td>
+            <td>${activity.startTime}</td>
+            <td>${activity.subject}</td>
+            <td>${activity.room}</td>
+            <td>${activity.status}</td>
+            <td>${activity.duration}</td>
+            <td><button onclick="updateActivity(${activity.idActivity}, 1)">deny</button></td>
+            </tr>`;
+            
+            idVar++;
+        }
+    })
+}
+
+function displayDeniedActivities(activities) {
+    const activityList = document.getElementById('deniedActivityList');
+    let idVar = 0
+
+    // Tøm listene først
+    activityList.innerHTML = `
+    <tr>
+        <th>idActivity</th>
+        <th>idUser</th>
+        <th>startTime</th>
+        <th>subject</th>
+        <th>room</th>
+        <th>status</th>
+        <th>duration</th>
+    </tr>`; 
+    
+    //persons.sort(function(a, b){return a.age - b.age})
+    console.log(activities)
+    activities.forEach(activity => {
+        if (activity.status == 'Annulert') {
+            activityList.innerHTML +=
+            //adds invis contextmenu
+            `<tr ondblclick="contextMenu(this.id)" id="${idVar}"> 
+            <td>${activity.idActivity}</td>
+            <td>${activity.idUser}</td>
+            <td>${activity.startTime}</td>
+            <td>${activity.subject}</td>
+            <td>${activity.room}</td>
+            <td>${activity.status}</td>
+            <td>${activity.duration}</td>
+            <td><button onclick="updateActivity(${activity.idActivity}, 3)">confirm</button></td>
+            </tr>`;
+            
+            idVar++;
+        }
+    })
+}
 
 
 //remove/edit users section
 const menu = document.getElementById("menu")
 document.body.addEventListener("click", function(){
     menu.style.display = "none";})
+
+
 function contextMenu(id){
-    
     menu.innerHTML =`
-        <button id="${id}" onclick="removeuser(${id})">delet</button>
-        <button id="${id}" onclick="edit(${id})">edit</button>`
+        <button id="${id}" onclick="removeuser(${id})">delet</button>`
     menu.style.display="block"
     menu.style.top=(`${event.clientY}px`)
     menu.style.left=(`${event.clientX}px`)
     
 }
-function edit(id) {
-    document.getElementById("name").value = persons[id].name
-    document.getElementById("age").value = persons[id].age
-    document.getElementById("email").value = persons[id].email
-    remove(id);
-}
+
 
 async function removeuser(id) {
     const user = persons[id]
@@ -123,6 +211,31 @@ async function removeuser(id) {
         }
 }
 
-async function updateStatus(){
-    
+
+
+async function updateActivity(idActivity, status) {
+    let activity = {
+        idTeacher: 1,
+        idStatus: status,
+        idActivity: idActivity
+    }
+    try {
+        const response = await fetch('/updateactivity/', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(activity) 
+        }); 
+        fetchActivities()
+        if (data.error) {
+            document.getElementById('error').innerText = data.error
+            document.getElementById('success').innerText = ''
+        } else { 
+            document.getElementById('success').innerText = data.message
+            document.getElementById('error').innerText = ''
+        }
+        
+    } catch (error) {
+        document.getElementById('error').innerText = 8+ error; 
+        document.getElementById('success').innerText = 'sum went wrong'; 
+    }
 }

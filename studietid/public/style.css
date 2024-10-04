@@ -8,14 +8,15 @@
 
 table {
     border: 1px solid;
-    padding: 30px;
+    padding: 5px;
     width: 60%;
     margin: auto;
 }
 td {
     border: 1px solid;
-    padding: 10px;
-    max-width: 100px;
+    padding: 5px;
+    max-width: 70px;
+    word-break: break-all;
 }
 
 .container {
