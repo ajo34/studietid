@@ -6,14 +6,19 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-const staticPath = path.join(__dirname, 'public')
+const staticPath = path.join(__dirname, 'public/login')
 
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(staticPath, 'index.html'))
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'));
 })
+
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(staticPath, '/admin/'))
+    res.sendFile(path.join(staticPath, '../admin/index.html'))
+})
+
+app.get('/student', (req, res) => {
+    res.sendFile(path.join(staticPath, '../main/index.html'));
 })
 
 app.get('/getusers/', (req, res) =>{
@@ -125,9 +130,8 @@ app.post('/removeuser', (req, res) => {
 
 
 function getFormattedDate() {
-    const date = new Date();
-    date.setHours(date.getHours() + 2);
-    const formattedDate = date.toISOString().replace('T', ' ').slice(0, 19);
+    const date = new Date().toLocaleString('sv-SE', {timeZone: 'Europe/Oslo'});
+    const formattedDate = date.toString().replace('T', ' ').slice(0, 19);
     return formattedDate;
 }
 

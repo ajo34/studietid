@@ -80,7 +80,7 @@ function displayUncheckedActivityList(activities) {
     </tr>`; 
     
     //persons.sort(function(a, b){return a.age - b.age})
-    console.log(activities)
+    
     activities.forEach(activity => {
         if (activity.status == 'Ubekreftet') {
             activityList.innerHTML +=
@@ -120,7 +120,7 @@ function displayConfirmedActivities(activities) {
     </tr>`; 
     
     //persons.sort(function(a, b){return a.age - b.age})
-    console.log(activities)
+    
     activities.forEach(activity => {
         if (activity.status == 'Bekreftet') {
             activityList.innerHTML +=
@@ -157,7 +157,7 @@ function displayDeniedActivities(activities) {
     </tr>`; 
     
     //persons.sort(function(a, b){return a.age - b.age})
-    console.log(activities)
+    
     activities.forEach(activity => {
         if (activity.status == 'Annulert') {
             activityList.innerHTML +=
@@ -170,7 +170,10 @@ function displayDeniedActivities(activities) {
             <td>${activity.room}</td>
             <td>${activity.status}</td>
             <td>${activity.duration}</td>
-            <td><button onclick="updateActivity(${activity.idActivity}, 3)">confirm</button></td>
+            <td>
+                <button onclick="updateActivity(${activity.idActivity}, 3)">confirm</button>
+                <button onclick="deleteActivity(${activity.idActivity})">delete</button>
+            </td>
             </tr>`;
             
             idVar++;

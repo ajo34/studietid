@@ -3,19 +3,17 @@
     text-align: center;
     background-color: rgb(15, 45, 45);
     color: rgb(232, 229, 225);
-    ;
 }
 
 table {
     border: 1px solid;
     padding: 5px;
-    width: 60%;
+    width: 90%;
     margin: auto;
 }
 td {
     border: 1px solid;
     padding: 5px;
-    max-width: 70px;
     word-break: break-all;
 }
 
@@ -31,7 +29,7 @@ input{
 }
 button {
     padding: 10px;
-    margin: 10px;
+    
     cursor: pointer;
 }
 #menu {
