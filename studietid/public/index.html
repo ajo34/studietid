@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Login</title>
+</head>
+<body>
+    <a href="/admin">Admain</a>
+    <a href="/student">Student</a>
+    <h1>legg til ny bruker</h1>
+    <form id="registerForm" name="registerForm" action="/adduser" method="POST">
+        <input type="text" name="firstName" id="firstName" placeholder="First name" required>
+        <input type="text" name="lastName" id="lastName" placeholder="Last name" required>
+        <input type="text" name="email" id="emaile" placeholder="Email" required>
+        <br>
+        <button type="submit">Register</button>
+    </form>
+
+    <h1>Logg inn</h1>
+
+    <form action="/login" method="POST">
+        <label for="email">email:</label>
+        <input type="text" id="email" name="email" required>
+        
+        <label for="password">Passord:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <button type="submit">Logg inn</button>
+      </form>
+</body>
+</html>

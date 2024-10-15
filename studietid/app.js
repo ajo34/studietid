@@ -2,24 +2,108 @@ const sqlite3 = require('better-sqlite3')
 const path = require('path')
 const db = sqlite3('./studietid.db', {verbose: console.log})
 const express = require('express')
-const app = express()
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+const app = express();
 
-const staticPath = path.join(__dirname, 'public/login')
+// Middleware for å parse innkommende forespørsler
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
+const staticPath = path.join(__dirname, 'public')
 
-app.get('/login', (req, res) => {
+//linking to login page
+app.get('/loginp', (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'));
 })
 
+//linking to admin page
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(staticPath, '../admin/index.html'))
+    res.sendFile(path.join(staticPath, '/admin/index.html'))
 })
 
+//linking to student page
 app.get('/student', (req, res) => {
-    res.sendFile(path.join(staticPath, '../main/index.html'));
+    res.sendFile(path.join(staticPath, '/student/index.html'));
 })
+
+
+
+
+
+
+
+
+// Konfigurere session
+app.use(session({
+    secret: 'hemmelig_nøkkel',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Sett til true hvis du bruker HTTPS
+}));
+
+// Simulerer en database av brukere med hash-verdi for passord
+//Legg inn denne hashete passordet for en av brukeree i databasen 
+//password: '$2b$10$TdG0ZjOgPSV8DnvxsV6KOemTr.3dyuC.RSNXcQGyJsXaIgPi4tu3K' 
+// Hash av "passord123"
+
+// Hashing av nytt passord (kan brukes for å opprette brukere)
+//    const saltRounds = 10;
+//    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+
+
+
+// Rute for innlogging
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    
+    // Finn brukeren basert på id/email
+    const user = getUser(emailExists(email).id)//hent bruker fra databasen basert på brukernavn
+    console.log(user)
+    console.log(user.password)
+    console.log(user.email)
+    
+    //tidlig sjekk om passord er fylt inn
+    if (!user) {
+        return res.status(401).send('Ugyldig brukernavn eller passord');
+    }
+    const hashedPassword = await bcrypt.hash(password, 10)
+    console.log(hashedPassword)
+    // Sjekk om passordet samsvarer med hash'en i databasen
+    const isMatch = await bcrypt.compare(password, user.password);
+    console.log(isMatch)
+    if (isMatch) {
+        // Lagre innloggingsstatus i session
+        req.session.loggedIn = true;
+        req.session.email = user.email;
+        
+        console.log('ting virket')
+        return res.send('Innlogging vellykket!');
+    } else {
+        return res.status(401).send('Ugyldig brukernavn eller passord');
+    }
+});
+
+// Beskyttet rute som krever at brukeren er innlogget
+app.get('/dashboard', (req, res) => {
+    if (req.session.loggedIn) {
+        res.send(`Velkommen, ${req.session.username}!`);
+    } else {
+        res.status(403).send('Du må være logget inn for å se denne siden.');
+    }
+});
+
+
+function getUser(id) {
+    console.log(id)
+    let sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, password, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
+    let rows = sql.all(id)
+    console.log(rows[0])
+    
+    return rows[0]
+}
+
 
 app.get('/getusers/', (req, res) =>{
     let sql = db.prepare(`
