@@ -68,16 +68,14 @@ app.post('/login', async (req, res) => {
     if (!user) {
         return res.status(401).send('Ugyldig brukernavn eller passord');
     }
-    const saltRounds = 10
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
-    console.log(hashedPassword)
+    
     // Sjekk om passordet samsvarer med hash'en i databasen
     const isMatch = await bcrypt.compare(password, user.password);
     console.log(isMatch)
     if (isMatch) {
         // Lagre innloggingsstatus i session 
         req.session.loggedIn = true;
-        req.session.email = user.email;
+        req.session.userId = user.id;
         
         console.log('ting virket')
         if (user.isAdmin) {
@@ -133,16 +131,16 @@ app.get('/getactivities/', (req, res) =>{
     
 })
 
-function addUser(firstName, lastName, idRole, isAdmin, email){
+function addUser(firstName, lastName, idRole, isAdmin, email, password){
     
     
-    let sql = db.prepare(`INSERT INTO user (firstName, lastName, idRole, isAdmin, email)  
-                        values (?, ?, ?, ?, ?)`)
-    const info = sql.run(firstName, lastName, idRole, isAdmin, email)
+    let sql = db.prepare(`INSERT INTO user (firstName, lastName, idRole, isAdmin, email, password)  
+                        values (?, ?, ?, ?, ?, ?)`)
+    const info = sql.run(firstName, lastName, idRole, isAdmin, email, password)
 
     
     sql = db.prepare(`
-        SELECT user.id as userid, firstname, lastname, email, role.name as role 
+        SELECT user.id as userid, firstname, lastname, email, password, role.name as role 
         FROM user inner join role on user.idrole = role.id WHERE user.id  = ?`);
     
     
@@ -169,20 +167,24 @@ function emailExists(email) {
 }
 
 
-app.post('/adduser', (req, res) => {
+app.post('/adduser', async (req, res) => {
     
-    const { firstName, lastName, idRole, isAdmin, email, password } = req.body;
-    if (checkValidEmail(email)) {
+    const { firstName, lastName, idRole, isAdmin, newEmail, newPassword } = req.body;
+
+    
+    if (checkValidEmail(newEmail)) {
         return res.json({ error: 'Email invalid' }); 
     }
-    if (emailExists(email)) {
+    if (emailExists(newEmail)) {
         res.redirect(`/index.html?errorMsg=EmailExists.`)
         return res('Email already exists')
         //return res.json({ error: 'Email already exists' });
     }
+    const saltRounds = 10
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
     // Insert new user 
     
-    const newUser = addUser(firstName, lastName, 2, 0, email);
+    const newUser = addUser(firstName, lastName, 2, 0, newEmail, hashedPassword);
     
     if (!newUser) { 
         console.log({ error: 'Failed to register user.' }); 
