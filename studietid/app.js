@@ -13,19 +13,19 @@ app.use(express.json());
 const staticPath = path.join(__dirname, 'public')
 
 //linking to login page
-app.get('/loginp', (req, res) => {
+/*app.get('/loginp', (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'));
-})
+})*/
 
 //linking to admin page
-app.get('/admin', (req, res) => {
+/*app.get('/admin', (req, res) => {
     res.sendFile(path.join(staticPath, '/admin/index.html'))
-})
+})*/
 
 //linking to student page
-app.get('/student', (req, res) => {
+/*app.get('/student', (req, res) => {
     res.sendFile(path.join(staticPath, '/student/index.html'));
-})
+})*/
 
 
 
@@ -68,17 +68,23 @@ app.post('/login', async (req, res) => {
     if (!user) {
         return res.status(401).send('Ugyldig brukernavn eller passord');
     }
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const saltRounds = 10
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
     console.log(hashedPassword)
     // Sjekk om passordet samsvarer med hash'en i databasen
     const isMatch = await bcrypt.compare(password, user.password);
     console.log(isMatch)
     if (isMatch) {
-        // Lagre innloggingsstatus i session
+        // Lagre innloggingsstatus i session 
         req.session.loggedIn = true;
         req.session.email = user.email;
         
         console.log('ting virket')
+        if (user.isAdmin) {
+            return res.redirect('/admin');
+        } else {
+            return res.redirect('/student');
+        }
         return res.send('Innlogging vellykket!');
     } else {
         return res.status(401).send('Ugyldig brukernavn eller passord');
@@ -97,7 +103,7 @@ app.get('/dashboard', (req, res) => {
 
 function getUser(id) {
     console.log(id)
-    let sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, password, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
+    let sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, password, isAdmin, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
     let rows = sql.all(id)
     console.log(rows[0])
     
@@ -165,7 +171,7 @@ function emailExists(email) {
 
 app.post('/adduser', (req, res) => {
     
-    const { firstName, lastName, idRole, isAdmin, email } = req.body;
+    const { firstName, lastName, idRole, isAdmin, email, password } = req.body;
     if (checkValidEmail(email)) {
         return res.json({ error: 'Email invalid' }); 
     }
