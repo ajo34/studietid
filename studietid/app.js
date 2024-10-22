@@ -49,8 +49,8 @@ app.get('/admin/*', checkLoggedIn, isAdminById, (req, res) => {
 function checkLoggedIn(req, res, next) {
     
     if (req.session.loggedIn) {
-        console.log('req.session.loggedIn)' + req.session.loggedIn)
-        console.log('Bruker logget inn:', req.userid);
+        console.log('er Bruker logget inn?:', req.session.loggedIn);
+        console.log('Bruker logget inn:', req.session.userId);
         return next();
     } else {
         res.redirect('/index.html');
@@ -62,10 +62,10 @@ function checkLoggedIn(req, res, next) {
 
 function isAdminById(req, res, next){
     let sql = db.prepare('SELECT isAdmin FROM user WHERE id = ?');
-    console.log('req.session.userId' + req.session.userId)
+    console.log('denne', req.session.userId)
     let rows = sql.all(req.session.userId)
-    console.log(rows[0] + " isAdmin?")
-    if (rows[0]) {
+    console.log(rows[0].isAdmin + " isAdmin?")
+    if (rows[0].isAdmin) {
         return next();
         
     } else {
@@ -285,6 +285,7 @@ app.post('/updateactivity', (req, res) => {
     return res.send('Activity updated')
 })
 
+
 app.get('/getsubjectroom/', (req, res) =>{
     let sql = db.prepare(`
         SELECT subject.name as subject, subject.id as idSubject, room.id as idRoom, room.name as room
@@ -297,7 +298,19 @@ app.get('/getsubjectroom/', (req, res) =>{
 })
 
 
-
+app.post('/removeactivity/', (req, res) => {
+    console.log(req.body)
+    const { idActivity } = req.body
+    console.log("idDeletedActivity", idActivity)
+    deleteActivity(idActivity);
+    return res.redirect('/admin');
+})
+function deleteActivity(idActivity){
+    let sql = db.prepare(`DELETE FROM activity WHERE id = ?`);
+    const info = sql.run(idActivity)
+    console.log(info)
+    
+}
 
 
 

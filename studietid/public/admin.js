@@ -199,19 +199,20 @@ function contextMenu(id){
 
 
 async function removeuser(id) {
+    console.log(persons)
     const user = persons[id]
     console.log('email to be deleted: ' + user.email);
-        try { 
-            const response = await fetch('/removeuser/', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify(user) 
-            })
-            
-        } catch (error) {
-            document.getElementById('error').innerText = error; 
-            document.getElementById('success').innerText = 'sum went wrong wit removing';
-        }
+    try { 
+        const response = await fetch('/removeuser/', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(user) 
+        })
+        
+    } catch (error) {
+        document.getElementById('error').innerText = error; 
+        document.getElementById('success').innerText = 'sum went wrong wit removing';
+    }
 }
 
 
@@ -240,5 +241,23 @@ async function updateActivity(idActivity, status) {
     } catch (error) {
         document.getElementById('error').innerText = 8+ error; 
         document.getElementById('success').innerText = 'sum went wrong'; 
+    }
+}
+
+async function deleteActivity(activityid) {
+    console.log('activity to be deleted: ' + activityid);
+    let idActivity = {
+        idActivity: activityid
+    }
+    try { 
+        const response = await fetch('/removeactivity/', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'}, 
+            body: JSON.stringify(idActivity)
+        })
+        fetchActivities()
+    } catch (error) {
+        document.getElementById('error').innerText = error; 
+        document.getElementById('success').innerText = 'sum went wrong wit removing';
     }
 }
