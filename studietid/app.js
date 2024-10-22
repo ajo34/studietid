@@ -12,15 +12,24 @@ app.use(express.json());
 
 const staticPath = path.join(__dirname, 'public')
 
+// Konfigurere session
+app.use(session({
+    secret: 'hemmelig_nøkkel',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Sett til true hvis du bruker HTTPS
+    
+}));
+
 //linking to login page
 /*app.get('/loginp', (req, res) => {
     res.sendFile(path.join(staticPath, 'index.html'));
 })*/
 
 //linking to admin page
-/*app.get('/admin', (req, res) => {
+app.get('/admin/*', checkLoggedIn, isAdminById, (req, res) => {
     res.sendFile(path.join(staticPath, '/admin/index.html'))
-})*/
+})
 
 //linking to student page
 /*app.get('/student', (req, res) => {
@@ -34,24 +43,36 @@ const staticPath = path.join(__dirname, 'public')
 
 
 
-// Konfigurere session
-app.use(session({
-    secret: 'hemmelig_nøkkel',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Sett til true hvis du bruker HTTPS
-}));
-
-// Simulerer en database av brukere med hash-verdi for passord
-//Legg inn denne hashete passordet for en av brukeree i databasen 
-//password: '$2b$10$TdG0ZjOgPSV8DnvxsV6KOemTr.3dyuC.RSNXcQGyJsXaIgPi4tu3K' 
-// Hash av "passord123"
-
-// Hashing av nytt passord (kan brukes for å opprette brukere)
-//    const saltRounds = 10;
-//    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
 
+// Middleware to check if the user is logged in
+function checkLoggedIn(req, res, next) {
+    
+    if (req.session.loggedIn) {
+        console.log('req.session.loggedIn)' + req.session.loggedIn)
+        console.log('Bruker logget inn:', req.userid);
+        return next();
+    } else {
+        res.redirect('/index.html');
+    }
+}
+
+
+
+
+function isAdminById(req, res, next){
+    let sql = db.prepare('SELECT isAdmin FROM user WHERE id = ?');
+    console.log('req.session.userId' + req.session.userId)
+    let rows = sql.all(req.session.userId)
+    console.log(rows[0] + " isAdmin?")
+    if (rows[0]) {
+        return next();
+        
+    } else {
+        return res.redirect('/student');
+    }
+    
+}
 
 
 // Rute for innlogging
@@ -75,9 +96,11 @@ app.post('/login', async (req, res) => {
     if (isMatch) {
         // Lagre innloggingsstatus i session 
         req.session.loggedIn = true;
-        req.session.userId = user.id;
+        console.log(req.session.loggedIn + "logged in");
+        req.session.userId = user.userid;
+        console.log(user.userid + "uderiD");
         
-        console.log('ting virket')
+        console.log(user.isAdmin)
         if (user.isAdmin) {
             return res.redirect('/admin');
         } else {
