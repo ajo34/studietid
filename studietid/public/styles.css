@@ -1,10 +1,15 @@
 *{
     border-radius: 10px;
     text-align: center;
-    background-color: rgb(15, 45, 45);
+    
     color: rgb(232, 229, 225);
 }
-
+body {
+    background-color: rgb(15, 45, 45);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
 table {
     border: 1px solid;
     padding: 5px;
@@ -29,7 +34,7 @@ input{
 }
 button {
     padding: 10px;
-    
+    background-color: rgb(15, 45, 45);
     cursor: pointer;
 }
 #menu {
@@ -44,12 +49,23 @@ button {
 }
 
 select {
+    background-color: rgb(15, 45, 45);
     padding: 10px;
     margin: 10px;
     border-radius: 10px;
 }
 
 #activityContainer {
-    background-color: rgb(25, 189, 112);
+    
     border: 10px solid white;
+    max-width: 200px;
+    margin: auto;
 }
+
+nav {
+    background-color: rgb(25, 189, 112);
+    border: 1px solid white;
+    width: 100%;
+    display: flex;
+}
+

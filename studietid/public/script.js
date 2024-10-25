@@ -1,11 +1,22 @@
 
 fetchSubjectRoom()
-
+fetchUserDetails()
 //const params = new URLSearchParams(window.location.search);
 //const errorMsg = params.get('errorMsg');
 //console.log(errorMsg);
 
-
+async function fetchUserDetails() {
+    try {
+        let response = await fetch('/getuserdetails/');
+        let data = await response.json();
+        console.log(data)
+        document.getElementById('firstNameTitle').innerText = data.firstName + " " + data.lastName;
+        document.getElementById('emailTitle').innerText = data.email;
+        
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 
 
 async function fetchSubjectRoom(){

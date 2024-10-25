@@ -32,9 +32,9 @@ app.get('/admin/*', checkLoggedIn, isAdminById, (req, res) => {
 })
 
 //linking to student page
-/*app.get('/student', (req, res) => {
+app.get('/student/*', checkLoggedIn, (req, res) => {
     res.sendFile(path.join(staticPath, '/student/index.html'));
-})*/
+})
 
 
 
@@ -261,8 +261,8 @@ function regActivity(idUser, startTime, idSubject, idRoom, idStatus, duration){
 app.post('/regactivity', (req, res) => {
     const { idUser, startTime, idSubject, idRoom, idStatus } = req.body
     console.log('test')
-    regActivity(1, getFormattedDate(), Number(idSubject), Number(idRoom), 2, 60)
-    res.sendFile(path.join(staticPath, 'index.html'))
+    regActivity(req.session.userId, getFormattedDate(), Number(idSubject), Number(idRoom), 2, 60)
+    res.redirect('/student')
     
 })
 
@@ -312,8 +312,14 @@ function deleteActivity(idActivity){
     
 }
 
-
-
+app.get('/getuserdetails/', (req, res) => {
+    //console.log(getUserDetails(req.session.userId)[0]);
+    let sql = db.prepare(`SELECT user.id as userid, firstname, lastname, email FROM user WHERE userid = ?`)
+    res.send(sql.all(req.session.userId)[0])
+})
+function getUserDetails(id){
+    
+}
 app.use(express.static(staticPath));
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000')
