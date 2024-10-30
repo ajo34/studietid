@@ -38,18 +38,10 @@ app.get('/student/*', checkLoggedIn, (req, res) => {
 
 
 
-
-
-
-
-
-
-
 // Middleware to check if the user is logged in
 function checkLoggedIn(req, res, next) {
     
     if (req.session.loggedIn) {
-        console.log('er Bruker logget inn?:', req.session.loggedIn);
         console.log('Bruker logget inn:', req.session.userId);
         return next();
     } else {
@@ -79,26 +71,25 @@ function isAdminById(req, res, next){
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     
-    // Finn brukeren basert på id/email
-    const user = getUser(emailExists(email).id)//hent bruker fra databasen basert på brukernavn
-    console.log(user)
-    console.log(user.password)
-    console.log(user.email)
+
+    //tidlig sjekk om emailen  eksisterer
+    let user = emailExists(email)
     
-    //tidlig sjekk om passord er fylt inn
     if (!user) {
-        return res.status(401).send('Ugyldig brukernavn eller passord');
+        return res.redirect(`/index.html?errorMsg=UgyldigEmail.`)
     }
+
+    // Finn brukeren basert på id/email
+    user = getUser(emailExists(email).id)
     
     // Sjekk om passordet samsvarer med hash'en i databasen
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log(isMatch)
+    
     if (isMatch) {
         // Lagre innloggingsstatus i session 
         req.session.loggedIn = true;
-        console.log(req.session.loggedIn + "logged in");
+        
         req.session.userId = user.userid;
-        console.log(user.userid + "uderiD");
         
         console.log(user.isAdmin)
         if (user.isAdmin) {
@@ -108,7 +99,7 @@ app.post('/login', async (req, res) => {
         }
         return res.send('Innlogging vellykket!');
     } else {
-        return res.status(401).send('Ugyldig brukernavn eller passord');
+        return res.redirect(`/index.html?errorMsg=WrongPassword.`)
     }
 });
 
@@ -185,7 +176,7 @@ function checkValidEmail(email) {
 function emailExists(email) {
     let sql=db.prepare(`SELECT user.id FROM USER WHERE email = ?`);
     const info = sql.get(email)
-    console.log('infolop:', info)
+    
     return info
 }
 
@@ -196,12 +187,11 @@ app.post('/adduser', async (req, res) => {
 
     
     if (checkValidEmail(newEmail)) {
-        return res.json({ error: 'Email invalid' }); 
+        return res.redirect(`/index.html?errorMsg=EmailInvalid.`); 
     }
     if (emailExists(newEmail)) {
-        res.redirect(`/index.html?errorMsg=EmailExists.`)
-        return res('Email already exists')
-        //return res.json({ error: 'Email already exists' });
+        return res.redirect(`/index.html?errorMsg=EmailExists.`)
+        
     }
     const saltRounds = 10
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
@@ -211,7 +201,7 @@ app.post('/adduser', async (req, res) => {
     
     if (!newUser) { 
         console.log({ error: 'Failed to register user.' }); 
-        return res.json({ error: 'Failed to register user.' });
+        return res.redirect(`/index.html?errorMsg=fail.`)
         
     }
     console.log({ message: 'User registered successfully!', user: newUser }); 
@@ -281,7 +271,7 @@ function updateActivity(  idTeacher, idStatus, idActivity){
 
 app.post('/updateactivity', (req, res) => {
     const {idTeacher, idStatus, idActivity} = req.body
-    updateActivity(idTeacher, idStatus, idActivity)
+    updateActivity(req.session.userId, idStatus, idActivity)
     return res.send('Activity updated')
 })
 
@@ -324,3 +314,5 @@ app.use(express.static(staticPath));
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000')
 })
+
+

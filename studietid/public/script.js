@@ -4,7 +4,7 @@ fetchUserDetails()
 //const params = new URLSearchParams(window.location.search);
 //const errorMsg = params.get('errorMsg');
 //console.log(errorMsg);
-
+let activeUserId = ""
 async function fetchUserDetails() {
     try {
         let response = await fetch('/getuserdetails/');
@@ -12,7 +12,7 @@ async function fetchUserDetails() {
         console.log(data)
         document.getElementById('firstNameTitle').innerText = data.firstName + " " + data.lastName;
         document.getElementById('emailTitle').innerText = data.email;
-        
+        activeUserId = data.userid
     } catch (error) {
         console.error('Error:', error);
     }
@@ -26,6 +26,20 @@ async function fetchSubjectRoom(){
         subRom(data);
         console.log(data)
 
+    } catch (error) {
+        console.error('Ereror', error);
+    }
+}
+
+
+fetchActivities()
+async function fetchActivities(){
+    try {
+        let response = await fetch('/getactivities/');
+        let data = await response.json();
+        console.log(data)
+        displayActivityList(data); //Display activitylists
+        
     } catch (error) {
         console.error('Ereror', error);
     }
@@ -49,6 +63,47 @@ function subRom(data){
 }
 
 document.getElementById('lightBtn').addEventListener('click',lightMode)
+
+
+
+
+function displayActivityList(activities) {
+    const activityList = document.getElementById('activityList');
+    let idVar = 0
+
+    // Tøm listene først
+    activityList.innerHTML = `
+    <tr>
+        <th>idActivity</th>
+        <th>idUser</th>
+        <th>startTime</th>
+        <th>subject</th>
+        <th>room</th>
+        <th>status</th>
+        <th>duration</th>
+    </tr>`; 
+    
+    //persons.sort(function(a, b){return a.age - b.age})
+    
+    activities.forEach(activity => {
+        if (activity.idUser == activeUserId) {
+            activityList.innerHTML +=
+            `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
+            <td>${activity.idActivity}</td>
+            <td>${activity.idUser}</td>
+            <td>${activity.startTime}</td>
+            <td>${activity.subject}</td>
+            <td>${activity.room}</td>
+            <td>${activity.status}</td>
+            <td>${activity.duration}</td>
+            </tr>`;
+            
+            idVar++;
+        }
+    })
+}
+
+
 
 function lightMode(){
     console.log('lightMode')

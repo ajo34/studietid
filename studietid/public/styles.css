@@ -10,6 +10,21 @@ body {
     margin: 0;
     padding: 0;
 }
+
+
+nav {
+    background-color: rgb(25, 189, 112);
+    border: 1px solid white;
+    width: 99.9%;
+    display: flex;
+}
+
+.navEl {
+    padding: 10px;
+    
+    color: white;
+    text-decoration: none;
+}
 table {
     border: 1px solid;
     padding: 5px;
@@ -31,6 +46,7 @@ td {
 input{ 
     padding: 10px;
     margin: 10px;
+    color: black;
 }
 button {
     padding: 10px;
@@ -60,12 +76,5 @@ select {
     border: 10px solid white;
     max-width: 200px;
     margin: auto;
-}
-
-nav {
-    background-color: rgb(25, 189, 112);
-    border: 1px solid white;
-    width: 100%;
-    display: flex;
 }
 
