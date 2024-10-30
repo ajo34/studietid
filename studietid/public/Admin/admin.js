@@ -1,5 +1,4 @@
 
-
 fetchUsers()
 async function fetchUsers(){
     try {

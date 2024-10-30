@@ -22,9 +22,9 @@ app.use(session({
 }));
 
 //linking to login page
-/*app.get('/loginp', (req, res) => {
-    res.sendFile(path.join(staticPath, 'index.html'));
-})*/
+app.get('/', checkLoggedIn, (req, res) => {
+    res.sendFile(path.join(staticPath, '/login/index.html'));
+})
 
 //linking to admin page
 app.get('/admin/*', checkLoggedIn, isAdminById, (req, res) => {
@@ -45,7 +45,7 @@ function checkLoggedIn(req, res, next) {
         console.log('Bruker logget inn:', req.session.userId);
         return next();
     } else {
-        res.redirect('/index.html');
+        res.redirect('/login/');
     }
 }
 
@@ -311,6 +311,9 @@ function getUserDetails(id){
     
 }
 app.use(express.static(staticPath));
+app.use(express.static(staticPath + "\admin"));
+console.log("staticpath", staticPath)
+
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000')
 })
