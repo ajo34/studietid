@@ -23,17 +23,17 @@ app.use(session({
 
 //linking to login page
 app.get('/', checkLoggedIn, (req, res) => {
-    res.sendFile(path.join(staticPath, '/login/index.html'));
+    res.sendFile(path.join(staticPath, '/login/'));
 })
 
 //linking to admin page
 app.get('/admin/*', checkLoggedIn, isAdminById, (req, res) => {
-    res.sendFile(path.join(staticPath, '/admin/index.html'))
+    res.sendFile(path.join(staticPath, '/admin/'))
 })
 
 //linking to student page
 app.get('/student/*', checkLoggedIn, (req, res) => {
-    res.sendFile(path.join(staticPath, '/student/index.html'));
+    res.sendFile(path.join(staticPath, '/student/'));
 })
 
 
@@ -61,7 +61,7 @@ function isAdminById(req, res, next){
         return next();
         
     } else {
-        return res.redirect('/student');
+        return res.redirect('/student/');
     }
     
 }
@@ -311,9 +311,6 @@ function getUserDetails(id){
     
 }
 app.use(express.static(staticPath));
-app.use(express.static(staticPath + "\admin"));
-console.log("staticpath", staticPath)
-
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000')
 })
