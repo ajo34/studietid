@@ -74,8 +74,6 @@ function displayActivityList(activities) {
     // Tøm listene først
     activityList.innerHTML = `
     <tr>
-        <th>idActivity</th>
-        <th>idUser</th>
         <th>startTime</th>
         <th>subject</th>
         <th>room</th>
@@ -89,8 +87,6 @@ function displayActivityList(activities) {
         if (activity.idUser == activeUserId) {
             activityList.innerHTML +=
             `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
-            <td>${activity.idActivity}</td>
-            <td>${activity.idUser}</td>
             <td>${activity.startTime}</td>
             <td>${activity.subject}</td>
             <td>${activity.room}</td>
@@ -109,6 +105,6 @@ function lightMode(){
     console.log('lightMode')
     const newLink = document.createElement('link')
     newLink.rel = 'stylesheet'
-    newLink.href = 'light.css'
+    newLink.href = '../light.css'
     document.head.replaceChild(newLink, document.getElementById('styl'));
 }

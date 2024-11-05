@@ -69,12 +69,9 @@ function displayUncheckedActivityList(activities) {
     // Tøm listene først
     activityList.innerHTML = `
     <tr>
-        <th>idActivity</th>
-        <th>idUser</th>
         <th>startTime</th>
         <th>subject</th>
         <th>room</th>
-        <th>status</th>
         <th>duration</th>
     </tr>`; 
     
@@ -84,12 +81,9 @@ function displayUncheckedActivityList(activities) {
         if (activity.status == 'Ubekreftet') {
             activityList.innerHTML +=
             `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
-            <td>${activity.idActivity}</td>
-            <td>${activity.idUser}</td>
             <td>${activity.startTime}</td>
             <td>${activity.subject}</td>
             <td>${activity.room}</td>
-            <td>${activity.status}</td>
             <td>${activity.duration}</td>
             <td>
                 <button onclick="updateActivity(${activity.idActivity}, 3)">confirm</button>
@@ -109,12 +103,9 @@ function displayConfirmedActivities(activities) {
     // Tøm listene først
     activityList.innerHTML = `
     <tr>
-        <th>idActivity</th>
-        <th>idUser</th>
         <th>startTime</th>
         <th>subject</th>
         <th>room</th>
-        <th>status</th>
         <th>duration</th>
     </tr>`; 
     
@@ -124,12 +115,9 @@ function displayConfirmedActivities(activities) {
         if (activity.status == 'Bekreftet') {
             activityList.innerHTML +=
             `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
-            <td>${activity.idActivity}</td>
-            <td>${activity.idUser}</td>
             <td>${activity.startTime}</td>
             <td>${activity.subject}</td>
             <td>${activity.room}</td>
-            <td>${activity.status}</td>
             <td>${activity.duration}</td>
             <td><button onclick="updateActivity(${activity.idActivity}, 1)">deny</button></td>
             </tr>`;
@@ -146,12 +134,9 @@ function displayDeniedActivities(activities) {
     // Tøm listene først
     activityList.innerHTML = `
     <tr>
-        <th>idActivity</th>
-        <th>idUser</th>
         <th>startTime</th>
         <th>subject</th>
         <th>room</th>
-        <th>status</th>
         <th>duration</th>
     </tr>`; 
     
@@ -162,12 +147,9 @@ function displayDeniedActivities(activities) {
             activityList.innerHTML +=
             //adds invis contextmenu
             `<tr ondblclick="contextMenu(this.id)" id="${idVar}"> 
-            <td>${activity.idActivity}</td>
-            <td>${activity.idUser}</td>
             <td>${activity.startTime}</td>
             <td>${activity.subject}</td>
             <td>${activity.room}</td>
-            <td>${activity.status}</td>
             <td>${activity.duration}</td>
             <td>
                 <button onclick="updateActivity(${activity.idActivity}, 3)">confirm</button>

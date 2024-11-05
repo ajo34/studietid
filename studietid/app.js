@@ -76,7 +76,7 @@ app.post('/login', async (req, res) => {
     let user = emailExists(email)
     
     if (!user) {
-        return res.redirect(`/index.html?errorMsg=UgyldigEmail.`)
+        return res.redirect(`/login/index.html?errorMsg=UgyldigEmail.`)
     }
 
     // Finn brukeren basert på id/email
@@ -91,7 +91,7 @@ app.post('/login', async (req, res) => {
         
         req.session.userId = user.userid;
         
-        console.log(user.isAdmin)
+        
         if (user.isAdmin) {
             return res.redirect('/admin');
         } else {
@@ -99,7 +99,7 @@ app.post('/login', async (req, res) => {
         }
         return res.send('Innlogging vellykket!');
     } else {
-        return res.redirect(`/index.html?errorMsg=WrongPassword.`)
+        return res.redirect(`/login/index.html?errorMsg=WrongPassword.`)
     }
 });
 
@@ -187,10 +187,10 @@ app.post('/adduser', async (req, res) => {
 
     
     if (checkValidEmail(newEmail)) {
-        return res.redirect(`/index.html?errorMsg=EmailInvalid.`); 
+        return res.redirect(`/login/index.html?errorMsg=EmailInvalid.`); 
     }
     if (emailExists(newEmail)) {
-        return res.redirect(`/index.html?errorMsg=EmailExists.`)
+        return res.redirect(`/login/index.html?errorMsg=EmailExists.`)
         
     }
     const saltRounds = 10
@@ -201,7 +201,7 @@ app.post('/adduser', async (req, res) => {
     
     if (!newUser) { 
         console.log({ error: 'Failed to register user.' }); 
-        return res.redirect(`/index.html?errorMsg=fail.`)
+        return res.redirect(`/login/index.html?errorMsg=fail.`)
         
     }
     console.log({ message: 'User registered successfully!', user: newUser }); 
