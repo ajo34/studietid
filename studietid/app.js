@@ -1,9 +1,10 @@
-const sqlite3 = require('better-sqlite3')
-const path = require('path')
-const db = sqlite3('./studietid.db', {verbose: console.log})
-const express = require('express')
-const session = require('express-session');
-const bcrypt = require('bcrypt');
+import sqlite3 from 'better-sqlite3';
+import path from 'path';
+import express from 'express';
+import session from 'express-session';
+import bcrypt from 'bcrypt';
+
+const db = sqlite3('./studietid.db', { verbose: console.log });
 const app = express();
 
 // Middleware for å parse innkommende forespørsler
@@ -11,6 +12,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const staticPath = path.join(__dirname, 'public')
+
+
+
+
 
 // Konfigurere session
 app.use(session({
@@ -22,8 +27,8 @@ app.use(session({
 }));
 
 //linking to login page
-app.get('/', checkLoggedIn, (req, res) => {
-    res.sendFile(path.join(staticPath, '/login/'));
+app.get('/', (req, res) => {
+    res.redirect('/login/');
 })
 
 //linking to admin page
@@ -32,7 +37,7 @@ app.get('/admin/*', checkLoggedIn, isAdminById, (req, res) => {
 })
 
 //linking to student page
-app.get('/student/*', checkLoggedIn, (req, res) => {
+app.get('/student/*', (req, res) => {
     res.sendFile(path.join(staticPath, '/student/'));
 })
 
@@ -97,7 +102,7 @@ app.post('/login', async (req, res) => {
         } else {
             return res.redirect('/student');
         }
-        return res.send('Innlogging vellykket!');
+        
     } else {
         return res.redirect(`/login/index.html?errorMsg=WrongPassword.`)
     }
@@ -123,7 +128,7 @@ function getUser(id) {
 }
 
 
-app.get('/getusers/', (req, res) =>{
+app.get('/getusers/', checkLoggedIn, isAdminById, (req, res) =>{
     let sql = db.prepare(`
         SELECT user.id as userid, firstname, lastname, email, role.name as role 
         FROM user inner join role on user.idrole = role.id `);
@@ -134,10 +139,21 @@ app.get('/getusers/', (req, res) =>{
     
 })
 
-app.get('/getactivities/', (req, res) =>{
+app.get('/getactivities/', checkLoggedIn, (req, res) =>{
     let sql = db.prepare(`
-        SELECT activity.id as idActivity, idUser, startTime, subject.name as subject, room.name as room, status.name as status, duration
-        from activity inner join subject on activity.idsubject = subject.id, room on activity.idroom = room.id, status on activity.idstatus = status.id`)
+        SELECT activity.id AS idActivity, startTime, subject.name AS subject, room.name AS room, status.name AS status, duration
+        From activity INNER JOIN subject ON activity.idsubject = subject.id, user ON activity.iduser=user.id, room ON activity.idroom = room.id, status ON activity.idstatus = status.id 
+        WHERE user.id = ?`)
+    let activities = sql.all(req.session.userId)
+    
+    
+    res.send(activities)
+    
+})
+app.get('/getallactivities/', checkLoggedIn, (req, res) =>{
+    let sql = db.prepare(`
+        SELECT activity.id AS idActivity, startTime, user.firstName AS firstName, user.lastName AS lastName, subject.name AS subject, room.name AS room, status.name AS status, duration
+        From activity INNER JOIN subject ON activity.idsubject = subject.id, user ON activity.iduser=user.id, room ON activity.idroom = room.id, status ON activity.idstatus = status.id `)
     let activities = sql.all()
     
     
@@ -222,7 +238,7 @@ function deleteUser(email){
     
 }
 
-app.post('/removeuser', (req, res) => {
+app.post('/removeuser',  (req, res) => {
     const { firstName, lastName, idRole, isAdmin, email } = req.body
     console.log("id", email)
 
@@ -307,9 +323,12 @@ app.get('/getuserdetails/', (req, res) => {
     let sql = db.prepare(`SELECT user.id as userid, firstname, lastname, email FROM user WHERE userid = ?`)
     res.send(sql.all(req.session.userId)[0])
 })
-function getUserDetails(id){
-    
-}
+
+
+
+//GET https://admin.googleapis.com/admin/directory/v1/users/{userKey}
+
+
 app.use(express.static(staticPath));
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000')

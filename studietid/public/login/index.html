@@ -19,8 +19,10 @@
         <button type="submit">Register</button>
     </form>
 
-    <h1>Logg inn</h1>
+    
 
+    <h1>Logg inn</h1>
+    <button id="googleLogin" onclick="oauthSignIn()">Log in with Google</button>
     <form action="/login" method="POST">
         <label for="email">email:</label>
         <input type="text" id="email" name="email" required>
@@ -31,6 +33,7 @@
         <button type="submit">Logg inn</button>
       </form>
     <p id="error"></p>
+    <div id="TOSDiv"><a href="/tos">Terms of Service</a></div>
       <script src="login.js"></script>
 </body>
 </html>

@@ -84,21 +84,58 @@ function displayActivityList(activities) {
     //persons.sort(function(a, b){return a.age - b.age})
     
     activities.forEach(activity => {
-        if (activity.idUser == activeUserId) {
-            activityList.innerHTML +=
-            `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
-            <td>${activity.startTime}</td>
-            <td>${activity.subject}</td>
-            <td>${activity.room}</td>
-            <td>${activity.status}</td>
-            <td>${activity.duration}</td>
-            </tr>`;
-            
-            idVar++;
-        }
+        
+        activityList.innerHTML +=
+        `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
+        <td>${activity.startTime}</td>
+        <td>${activity.subject}</td>
+        <td>${activity.room}</td>
+        <td>${activity.status}</td>
+        <td>${activity.duration}</td>
+        </tr>`;
+        
+        idVar++;
+        
     })
 }
 
+
+let params = {}
+
+let regex = /([^&=]+)=([^&]*)/g, m;
+while (m = regex.exec(location.href)) {
+    params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+}
+
+if(Object.keys(params).length !== 0){
+    localStorage.setItem('authInfo', JSON.stringify(params))
+} else {
+    console.log('no token')
+}
+
+//hide token
+//window.history.pushState({}, document.title, "/" + "student" + "/");
+
+let info = JSON.parse(localStorage.getItem('authInfo'))
+console.log(JSON.parse(localStorage.getItem('authInfo')))
+console.log('log', info['access_token'])
+console.log(info['expires_in'])
+
+console.log(info)
+fetch('https://www.googleapis.com/oauth2/v3/userinfo',{
+    headers: {
+        'Authorization': `Bearer ${info['access_token']}`
+    }
+})
+.then((data) => data.json())
+.then((info) => {
+    console.log(info)
+})
+
+
+function logout() {
+
+}
 
 
 function lightMode(){

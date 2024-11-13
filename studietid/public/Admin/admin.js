@@ -44,7 +44,7 @@ function displayPersons(persons) {
 fetchActivities()
 async function fetchActivities(){
     try {
-        let response = await fetch('/getactivities/');
+        let response = await fetch('/getallactivities/');
         let data = await response.json();
         console.log(data)
         activityListDisplayer(data); //Display activitylists
@@ -69,6 +69,7 @@ function displayUncheckedActivityList(activities) {
     // Tøm listene først
     activityList.innerHTML = `
     <tr>
+        <th>student</th>
         <th>startTime</th>
         <th>subject</th>
         <th>room</th>
@@ -81,6 +82,7 @@ function displayUncheckedActivityList(activities) {
         if (activity.status == 'Ubekreftet') {
             activityList.innerHTML +=
             `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
+            <td>${activity.firstName} ${activity.lastName}</td>
             <td>${activity.startTime}</td>
             <td>${activity.subject}</td>
             <td>${activity.room}</td>
@@ -103,6 +105,7 @@ function displayConfirmedActivities(activities) {
     // Tøm listene først
     activityList.innerHTML = `
     <tr>
+        <th>student</th>
         <th>startTime</th>
         <th>subject</th>
         <th>room</th>
@@ -115,6 +118,7 @@ function displayConfirmedActivities(activities) {
         if (activity.status == 'Bekreftet') {
             activityList.innerHTML +=
             `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
+            <td>${activity.firstName} ${activity.lastName}</td>
             <td>${activity.startTime}</td>
             <td>${activity.subject}</td>
             <td>${activity.room}</td>
@@ -134,6 +138,7 @@ function displayDeniedActivities(activities) {
     // Tøm listene først
     activityList.innerHTML = `
     <tr>
+        <th>student</th>
         <th>startTime</th>
         <th>subject</th>
         <th>room</th>
@@ -146,7 +151,8 @@ function displayDeniedActivities(activities) {
         if (activity.status == 'Annulert') {
             activityList.innerHTML +=
             //adds invis contextmenu
-            `<tr ondblclick="contextMenu(this.id)" id="${idVar}"> 
+            `<tr ondblclick="contextMenu(this.id)" id="${idVar}">
+            <td>${activity.firstName} ${activity.lastName}</td>
             <td>${activity.startTime}</td>
             <td>${activity.subject}</td>
             <td>${activity.room}</td>
