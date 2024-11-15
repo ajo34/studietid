@@ -1,30 +1,69 @@
-import sqlite3 from 'better-sqlite3';
-import path from 'path';
+// Porpuse: Main file for the application
+
+// Modules
+import * as sql from './modules/sql.js';
+//import { SERVER_ROOT_URI, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from './config.js';
+import { checkLoggedIn, isAdminById} from './modules/middleware.js';
+
+// Node imports
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import session from 'express-session';
 import bcrypt from 'bcrypt';
+import { configDotenv } from 'dotenv';
 
-const db = sqlite3('./studietid.db', { verbose: console.log });
 const app = express();
 
-// Middleware for å parse innkommende forespørsler
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+/*
+const redirectURI = "/google";
 
-const staticPath = path.join(__dirname, 'public')
+function getGoogleAuthURL() 
+{
+    const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+    const options = {
+      redirect_uri: ${SERVER_ROOT_URI}/${redirectURI},
+      client_id: GOOGLE_CLIENT_ID,
+      access_type: "offline",
+      response_type: "code",
+      prompt: "consent",
+      scope: [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+      ].join(" "),
+    };
 
+    return ${rootUrl}?${querystring.stringify(options)};
+}
 
+app.get("/google/url", (req, res) => {
+    res.send(getGoogleAuthURL());
+});
+*/
 
+configDotenv();
+const SECRET = process.env.SECRET;
 
-
-// Konfigurere session
 app.use(session({
-    secret: 'hemmelig_nøkkel',
+    secret: SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Sett til true hvis du bruker HTTPS
-    
+    cookie: {secure: false}
 }));
+
+const staticPath = path.join(__dirname, 'public');
+
+// Body parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+
+
+
+
 
 //linking to login page
 app.get('/', (req, res) => {
@@ -33,43 +72,20 @@ app.get('/', (req, res) => {
 
 //linking to admin page
 app.get('/admin/*', checkLoggedIn, isAdminById, (req, res) => {
-    res.sendFile(path.join(staticPath, '/admin/'))
+    res.sendFile(path.join(__dirname, '/public/admin/'))
 })
 
 //linking to student page
-app.get('/student/*', (req, res) => {
-    res.sendFile(path.join(staticPath, '/student/'));
+app.get('/student/*', checkLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/student/'));
+})
+
+app.get('/tos/*', checkLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, '/public/tos/'));
 })
 
 
 
-// Middleware to check if the user is logged in
-function checkLoggedIn(req, res, next) {
-    
-    if (req.session.loggedIn) {
-        console.log('Bruker logget inn:', req.session.userId);
-        return next();
-    } else {
-        res.redirect('/login/');
-    }
-}
-
-
-
-
-function isAdminById(req, res, next){
-    let sql = db.prepare('SELECT isAdmin FROM user WHERE id = ?');
-    console.log('denne', req.session.userId)
-    let rows = sql.all(req.session.userId)
-    console.log(rows[0].isAdmin + " isAdmin?")
-    if (rows[0].isAdmin) {
-        return next();
-        
-    } else {
-        return res.redirect('/student/');
-    }
-    
-}
 
 
 // Rute for innlogging
@@ -78,14 +94,14 @@ app.post('/login', async (req, res) => {
     
 
     //tidlig sjekk om emailen  eksisterer
-    let user = emailExists(email)
+    let user = sql.emailExists(email)
     
     if (!user) {
         return res.redirect(`/login/index.html?errorMsg=UgyldigEmail.`)
     }
 
     // Finn brukeren basert på id/email
-    user = getUser(emailExists(email).id)
+    user = sql.getUser(sql.emailExists(email).id)
     
     // Sjekk om passordet samsvarer med hash'en i databasen
     const isMatch = await bcrypt.compare(password, user.password);
@@ -93,7 +109,7 @@ app.post('/login', async (req, res) => {
     if (isMatch) {
         // Lagre innloggingsstatus i session 
         req.session.loggedIn = true;
-        
+        req.session.role = user.role;
         req.session.userId = user.userid;
         
         
@@ -118,83 +134,27 @@ app.get('/dashboard', (req, res) => {
 });
 
 
-function getUser(id) {
-    console.log(id)
-    let sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, password, isAdmin, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
-    let rows = sql.all(id)
-    console.log(rows[0])
-    
-    return rows[0]
-}
 
 
-app.get('/getusers/', checkLoggedIn, isAdminById, (req, res) =>{
-    let sql = db.prepare(`
-        SELECT user.id as userid, firstname, lastname, email, role.name as role 
-        FROM user inner join role on user.idrole = role.id `);
-    let users = sql.all()
+
+app.get('/getusers/', checkLoggedIn, (req, res) =>{
     
-    
-    res.send(users)
+    res.send(sql.getUsers())
     
 })
 
 app.get('/getactivities/', checkLoggedIn, (req, res) =>{
-    let sql = db.prepare(`
-        SELECT activity.id AS idActivity, startTime, subject.name AS subject, room.name AS room, status.name AS status, duration
-        From activity INNER JOIN subject ON activity.idsubject = subject.id, user ON activity.iduser=user.id, room ON activity.idroom = room.id, status ON activity.idstatus = status.id 
-        WHERE user.id = ?`)
-    let activities = sql.all(req.session.userId)
-    
-    
-    res.send(activities)
+    res.send(sql.getActivities(req.session.userId))
     
 })
 app.get('/getallactivities/', checkLoggedIn, (req, res) =>{
-    let sql = db.prepare(`
-        SELECT activity.id AS idActivity, startTime, user.firstName AS firstName, user.lastName AS lastName, subject.name AS subject, room.name AS room, status.name AS status, duration
-        From activity INNER JOIN subject ON activity.idsubject = subject.id, user ON activity.iduser=user.id, room ON activity.idroom = room.id, status ON activity.idstatus = status.id `)
-    let activities = sql.all()
     
     
-    res.send(activities)
+    res.send(sql.getAllActivities())
     
 })
 
-function addUser(firstName, lastName, idRole, isAdmin, email, password){
-    
-    
-    let sql = db.prepare(`INSERT INTO user (firstName, lastName, idRole, isAdmin, email, password)  
-                        values (?, ?, ?, ?, ?, ?)`)
-    const info = sql.run(firstName, lastName, idRole, isAdmin, email, password)
 
-    
-    sql = db.prepare(`
-        SELECT user.id as userid, firstname, lastname, email, password, role.name as role 
-        FROM user inner join role on user.idrole = role.id WHERE user.id  = ?`);
-    
-    
-    let rows = sql.all(info.lastInsertRowid)
-    console.log("row inserted",rows[0])
-    
-    return rows[0]
-    
-}
-
-function checkValidEmail(email) {
-    let re = RegExp('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$')
-    if (!re.test(email)) {
-        return true
-    } else {return false}
-
-}
-
-function emailExists(email) {
-    let sql=db.prepare(`SELECT user.id FROM USER WHERE email = ?`);
-    const info = sql.get(email)
-    
-    return info
-}
 
 
 app.post('/adduser', async (req, res) => {
@@ -202,10 +162,10 @@ app.post('/adduser', async (req, res) => {
     const { firstName, lastName, idRole, isAdmin, newEmail, newPassword } = req.body;
 
     
-    if (checkValidEmail(newEmail)) {
+    if (sql.checkValidEmail(newEmail)) {
         return res.redirect(`/login/index.html?errorMsg=EmailInvalid.`); 
     }
-    if (emailExists(newEmail)) {
+    if (sql.emailExists(newEmail)) {
         return res.redirect(`/login/index.html?errorMsg=EmailExists.`)
         
     }
@@ -213,7 +173,7 @@ app.post('/adduser', async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
     // Insert new user 
     
-    const newUser = addUser(firstName, lastName, 2, 0, newEmail, hashedPassword);
+    const newUser = sql.addUser(firstName, lastName, 2, 0, newEmail, hashedPassword);
     
     if (!newUser) { 
         console.log({ error: 'Failed to register user.' }); 
@@ -222,106 +182,59 @@ app.post('/adduser', async (req, res) => {
     }
     console.log({ message: 'User registered successfully!', user: newUser }); 
 
-    res.sendFile(path.join(staticPath, 'index.html'))
+    res.redirect('/login')
 });
 
 
-function deleteUser(email){
 
-    let sql = db.prepare(`
-    SELECT user.id as userid, firstname, lastname, email
-    FROM user WHERE email  = ?`);
-    
-    sql = db.prepare(`DELETE FROM user WHERE email = ?`);
-    const info = sql.run(email)
 
-    
-}
-
-app.post('/removeuser',  (req, res) => {
+app.post('/removeuser',  checkLoggedIn, isAdminById, (req, res) => {
     const { firstName, lastName, idRole, isAdmin, email } = req.body
     console.log("id", email)
 
-    deleteUser(email);
+    sql.deleteUser(email);
     res.sendFile(path.join(staticPath, 'index.html'))
 })
 
 
 
 
-
-function getFormattedDate() {
-    const date = new Date().toLocaleString('sv-SE', {timeZone: 'Europe/Oslo'});
-    const formattedDate = date.toString().replace('T', ' ').slice(0, 19);
-    return formattedDate;
-}
-
-function regActivity(idUser, startTime, idSubject, idRoom, idStatus, duration){
-    let sql = db.prepare(`INSERT INTO activity (idUser, startTime, idSubject, idRoom, idStatus, duration)
-                        values (?, ?, ?, ?, ?, ?)`)
-    const info = sql.run(idUser, startTime, idSubject, idRoom, idStatus, duration)
-    console.log(info)
-
-}
-
-app.post('/regactivity', (req, res) => {
+app.post('/regactivity', checkLoggedIn, (req, res) => {
     const { idUser, startTime, idSubject, idRoom, idStatus } = req.body
     console.log('test')
-    regActivity(req.session.userId, getFormattedDate(), Number(idSubject), Number(idRoom), 2, 60)
+    sql.regActivity(req.session.userId, sql.getFormattedDate(), Number(idSubject), Number(idRoom), 2, 60)
     res.redirect('/student')
     
 })
 
 
-function updateActivity(  idTeacher, idStatus, idActivity){
-    
-    let sql = db.prepare(`UPDATE activity set idTeacher = ?, idStatus = ? WHERE id = ?`)
-    const info = sql.run(idTeacher, idStatus, idActivity)
-    console.log(info)
-    if (info.changes !== 0) {
-        return 0
-    } else {
-        return { error: 'Failed to confirm activity.' }
-    }
-}
 
-app.post('/updateactivity', (req, res) => {
+
+app.post('/updateactivity', checkLoggedIn, isAdminById, (req, res) => {
     const {idTeacher, idStatus, idActivity} = req.body
-    updateActivity(req.session.userId, idStatus, idActivity)
+    sql.updateActivity(req.session.userId, idStatus, idActivity)
     return res.send('Activity updated')
 })
 
 
-app.get('/getsubjectroom/', (req, res) =>{
-    let sql = db.prepare(`
-        SELECT subject.name as subject, subject.id as idSubject, room.id as idRoom, room.name as room
-        FROM subject inner join room on subject.id = room.id `);
-    let thingies = sql.all()
-    
-    
-    res.send(thingies)
+app.get('/getsubjectroom/', checkLoggedIn, (req, res) =>{
+
+    res.send(sql.getSubjectRoom())
     
 })
 
 
-app.post('/removeactivity/', (req, res) => {
+app.post('/removeactivity/', checkLoggedIn, isAdminById, (req, res) => {
     console.log(req.body)
     const { idActivity } = req.body
     console.log("idDeletedActivity", idActivity)
-    deleteActivity(idActivity);
+    sql.deleteActivity(idActivity);
     return res.redirect('/admin');
 })
-function deleteActivity(idActivity){
-    let sql = db.prepare(`DELETE FROM activity WHERE id = ?`);
-    const info = sql.run(idActivity)
-    console.log(info)
-    
-}
 
-app.get('/getuserdetails/', (req, res) => {
-    //console.log(getUserDetails(req.session.userId)[0]);
-    let sql = db.prepare(`SELECT user.id as userid, firstname, lastname, email FROM user WHERE userid = ?`)
-    res.send(sql.all(req.session.userId)[0])
+app.get('/getuserdetails/', checkLoggedIn, (req, res) => {
+    console.log(sql.getUserDetails(req.session.userId)[0]);
+    res.send(sql.getUserDetails(req.session.userId))
 })
 
 
