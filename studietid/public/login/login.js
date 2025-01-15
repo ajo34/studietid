@@ -1,19 +1,8 @@
-/*const client = new Client();
-client.setProject('672b5e850027991c1278');
 
-
-async function handleLogin() {
-    Account.createOAuth2Session(
-        'google',
-        'http://localhost:3000/',
-        'http://localhost:3000/fail'
-    )
-
-}*/
 
 /*
  * Create form to request access token from Google's OAuth 2.0 server.
- */
+ 
 function oauthSignIn() {
     // Google's OAuth 2.0 endpoint for requesting an access token
     var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -46,7 +35,7 @@ function oauthSignIn() {
     form.submit();
     
 }
-
+*/
 
 
 

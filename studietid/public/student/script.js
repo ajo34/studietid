@@ -100,7 +100,7 @@ function displayActivityList(activities) {
 }
 
 
-let params = {}
+/*let params = {}
 
 let regex = /([^&=]+)=([^&]*)/g, m;
 while (m = regex.exec(location.href)) {
@@ -136,7 +136,7 @@ fetch('https://www.googleapis.com/oauth2/v3/userinfo',{
 function logout() {
 
 }
-
+*/
 
 function lightMode(){
     console.log('lightMode')

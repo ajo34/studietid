@@ -248,3 +248,5 @@ async function deleteActivity(activityid) {
         document.getElementById('success').innerText = 'sum went wrong wit removing';
     }
 }
+
+

@@ -2,7 +2,7 @@
 
 // Modules
 import * as sql from './modules/sql.js';
-//import { SERVER_ROOT_URI, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from './config.js';
+
 import { checkLoggedIn, isAdminById} from './modules/middleware.js';
 
 // Node imports
@@ -13,35 +13,56 @@ import session from 'express-session';
 import bcrypt from 'bcrypt';
 import { configDotenv } from 'dotenv';
 
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+
+import {
+    SERVER_ROOT_URI,
+    GOOGLE_CLIENT_ID,
+    JWT_SECRET,
+    GOOGLE_CLIENT_SECRET,
+    COOKIE_NAME,
+    UI_ROOT_URI,
+} from "./config.js";
+
+
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-/*
-const redirectURI = "/google";
 
-function getGoogleAuthURL() 
-{
-    const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
-    const options = {
-      redirect_uri: ${SERVER_ROOT_URI}/${redirectURI},
-      client_id: GOOGLE_CLIENT_ID,
-      access_type: "offline",
-      response_type: "code",
-      prompt: "consent",
-      scope: [
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/userinfo.email",
-      ].join(" "),
-    };
 
-    return ${rootUrl}?${querystring.stringify(options)};
-}
 
-app.get("/google/url", (req, res) => {
-    res.send(getGoogleAuthURL());
-});
-*/
+passport.use(new GoogleStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/google"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    /*User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });*/
+    console.log(profile)
+    return cb(null, profile);
+  }
+));
+
+
+
+
+
+app.get('/google',
+    passport.authenticate('google', { scope: ['profile'] }));
+  
+  app.get('/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    function(req, res) {
+      // Successful authentication, redirect home.
+      res.redirect('/student');
+    });
+
+
+
 
 configDotenv();
 const SECRET = process.env.SECRET;

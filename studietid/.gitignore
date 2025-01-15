@@ -1,0 +1,17 @@
+#Ignore the database
+database.db
+
+# Ignore node_modules
+node_modules/
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore environment variable files
+.env
+config.js
+
+# Ignore build outputs
+dist/
+build/
