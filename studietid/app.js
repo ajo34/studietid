@@ -132,6 +132,7 @@ app.post('/login', async (req, res) => {
         req.session.loggedIn = true;
         req.session.role = user.role;
         req.session.userId = user.userid;
+        req.session.class = user.class
         
         
         if (user.isAdmin) {
@@ -245,7 +246,7 @@ app.get('/getroom/', checkLoggedIn, (req, res) =>{
 
 app.get('/getsubject/', checkLoggedIn, (req, res) =>{
 
-    res.send(sql.getSubject())
+    res.send(sql.getSubject(req.session.class))
     
 })
 

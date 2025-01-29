@@ -154,11 +154,11 @@ export function getRoom() {
     return sql.all()
 }
 
-export function getSubject() {
+export function getSubject(classId) {
     let sql = db.prepare(`
-        SELECT subject.name as subject, subject.id as idSubject
-        FROM subject`);
-    return sql.all()
+        SELECT class_subject.subject as idSubject, subject.name as subject FROM class_subject 
+        INNER JOIN subject on subject.id = class_subject.subject WHERE class = ? `);
+    return sql.all(classId)
 }
 
 export function getUserDetails(userId) {
