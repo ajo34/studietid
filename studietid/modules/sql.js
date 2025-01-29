@@ -6,7 +6,7 @@ console.log(db)
 
 export function getUser(id) {
     console.log(id)
-    let sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, password, isAdmin, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
+    let sql = db.prepare('SELECT user.id as userid, firstname, lastname, email, password, isAdmin, class, role.name  as role FROM user inner join role on user.idrole = role.id   WHERE user.id  = ?');
     let rows = sql.all(id)
     console.log(rows[0])
     
@@ -147,14 +147,60 @@ export function getActivities(userId) {
     return sql.all(userId)
 }
 
-export function getSubjectRoom() {
+export function getRoom() {
     let sql = db.prepare(`
-        SELECT subject.name as subject, subject.id as idSubject, room.id as idRoom, room.name as room
-        FROM subject inner join room on subject.id = room.id `);
+        SELECT room.id as idRoom, room.name as room
+        FROM room`);
+    return sql.all()
+}
+
+export function getSubject() {
+    let sql = db.prepare(`
+        SELECT subject.name as subject, subject.id as idSubject
+        FROM subject`);
     return sql.all()
 }
 
 export function getUserDetails(userId) {
     let sql = db.prepare(`SELECT user.id as userid, firstname, lastname, email FROM user WHERE userid = ?`)
     return sql.all(userId)[0]
+}
+
+
+//getting classes and subs from csv stuff starts here
+
+export function regClass(name){
+    let sql = db.prepare(`INSERT INTO class (name) VALUES (?)`)
+    const info = sql.run(name)
+    console.log(info)
+}
+
+export function regSubject(name, code){
+    let sql = db.prepare(`INSERT INTO subject (name, code) VALUES (?, ?)`)
+    const info = sql.run(name, code)
+    console.log(info)
+}
+
+export function insertClassSubjectRelations(classId, subjectId) {
+    let sql = db.prepare(`INSERT INTO class_subject (class, subject) VALUES (?, ?)`)
+    const info = sql.run(classId, subjectId)
+    console.log(info)
+}
+
+export function getClassesAndSubjects(className, subjectCode) {
+    let sql = db.prepare(`
+        SELECT class.id as classId, subject.id as subjectId FROM class 
+        INNER JOIN subject ON subject.code = ? 
+        WHERE class.name = ?`)
+    const info = sql.get(className, subjectCode)
+    return info
+}
+
+
+export function subjectExists(subjectName) {
+    console.log(subjectName)
+    let sql=db.prepare(`SELECT subject.id FROM subject WHERE code = ?`);
+    const info = sql.get(subjectName)
+    
+    return info
 }

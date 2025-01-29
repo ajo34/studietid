@@ -188,7 +188,6 @@ app.post('/adduser', async (req, res) => {
     }
     if (sql.emailExists(newEmail)) {
         return res.redirect(`/login/index.html?errorMsg=EmailExists.`)
-        
     }
     const saltRounds = 10
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
@@ -238,9 +237,15 @@ app.post('/updateactivity', checkLoggedIn, isAdminById, (req, res) => {
 })
 
 
-app.get('/getsubjectroom/', checkLoggedIn, (req, res) =>{
+app.get('/getroom/', checkLoggedIn, (req, res) =>{
 
-    res.send(sql.getSubjectRoom())
+    res.send(sql.getRoom())
+    
+})
+
+app.get('/getsubject/', checkLoggedIn, (req, res) =>{
+
+    res.send(sql.getSubject())
     
 })
 
@@ -261,6 +266,10 @@ app.get('/getuserdetails/', checkLoggedIn, (req, res) => {
 
 
 //GET https://admin.googleapis.com/admin/directory/v1/users/{userKey}
+
+
+
+
 
 
 app.use(express.static(staticPath));

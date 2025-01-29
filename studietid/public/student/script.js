@@ -1,5 +1,6 @@
 
-fetchSubjectRoom()
+fetchSubject()
+fetchRoom()
 fetchUserDetails()
 //const params = new URLSearchParams(window.location.search);
 //const errorMsg = params.get('errorMsg');
@@ -19,11 +20,22 @@ async function fetchUserDetails() {
 }
 
 
-async function fetchSubjectRoom(){
+async function fetchSubject(){
     try {
-        let response = await fetch('/getsubjectroom/');
+        let response = await fetch('/getsubject/');
         let data = await response.json();
-        subRom(data);
+        displaySubject(data);
+        console.log(data)
+
+    } catch (error) {
+        console.error('Ereror', error);
+    }
+}
+async function fetchRoom(){
+    try {
+        let response = await fetch('/getroom/');
+        let data = await response.json();
+        displayRoom(data);
         console.log(data)
 
     } catch (error) {
@@ -45,21 +57,30 @@ async function fetchActivities(){
     }
 }
 
-function subRom(data){
-    const roomSelect = document.getElementById('roomSelect')
+function displaySubject(data){
+    
     const subjectSelect = document.getElementById('subjectSelect')
+    
     for (let i = 0; i < data.length; i++) {
-    const rOption = document.createElement('option')
-    rOption.textContent = data[i].room
-    rOption.value=data[i].idRoom
-    roomSelect.appendChild(rOption)
+        const sOption = document.createElement('option')
+        sOption.textContent = data[i].subject
+        sOption.value=data[i].idSubject
+        subjectSelect.appendChild(sOption)
+        
 
-    const sOption = document.createElement('option')
-    sOption.textContent = data[i].subject
-    sOption.value=data[i].idSubject
-    subjectSelect.appendChild(sOption)
     }
 
+}
+
+function displayRoom(data) {
+    const roomSelect = document.getElementById('roomSelect')
+
+    for (let i = 0; i < data.length; i++) {
+        const rOption = document.createElement('option')
+        rOption.textContent = data[i].room
+        rOption.value=data[i].idRoom
+        roomSelect.appendChild(rOption)
+    }
 }
 
 document.getElementById('lightBtn').addEventListener('click',lightMode)

@@ -1,7 +1,7 @@
 *{
     border-radius: 10px;
     text-align: center;
-    
+    min-width: fit-content;
     color: rgb(232, 229, 225);
 }
 body {
