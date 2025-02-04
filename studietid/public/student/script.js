@@ -26,7 +26,6 @@ async function fetchSubject(){
         let data = await response.json();
         displaySubject(data);
         console.log(data)
-
     } catch (error) {
         console.error('Ereror', error);
     }
