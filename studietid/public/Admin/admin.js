@@ -23,6 +23,7 @@ function displayPersons(persons) {
         <th>Last name</th>
         <th>Role</th>
         <th>Email</th>
+        <th>Class</th>
     </tr>
     `; // Tøm listen først
     //persons.sort(function(a, b){return a.age - b.age})
@@ -34,6 +35,7 @@ function displayPersons(persons) {
         <td>${person.lastName}</td>
         <td>${person.role}</td>
         <td>${person.email}</td>
+        <td>${person.class}</td>
         </tr>`;
         idVar++;
     })

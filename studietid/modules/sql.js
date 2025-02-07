@@ -112,6 +112,7 @@ export function getUsers(){
         firstname, 
         lastname, 
         email, 
+        class,
         role.name as role 
         FROM user inner join 
         role on user.idrole = role.id `);
@@ -162,7 +163,7 @@ export function getSubject(classId) {
 }
 
 export function getUserDetails(userId) {
-    let sql = db.prepare(`SELECT user.id as userid, firstname, lastname, email FROM user WHERE userid = ?`)
+    let sql = db.prepare(`SELECT user.id as userid, firstname, lastname, email, image FROM user WHERE userid = ?`)
     return sql.all(userId)[0]
 }
 

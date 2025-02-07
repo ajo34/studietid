@@ -190,10 +190,11 @@ app.post('/adduser', async (req, res) => {
     if (sql.emailExists(newEmail)) {
         return res.redirect(`/login/index.html?errorMsg=EmailExists.`)
     }
+    //hash the password
     const saltRounds = 10
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
+
     // Insert new user 
-    
     const newUser = sql.addUser(firstName, lastName, 2, 0, newEmail, hashedPassword);
     
     if (!newUser) { 

@@ -13,6 +13,7 @@ async function fetchUserDetails() {
         console.log(data)
         document.getElementById('firstNameTitle').innerText = data.firstName + " " + data.lastName;
         document.getElementById('emailTitle').innerText = data.email;
+        document.getElementById('userImageDiv').innerHTML = `<img src="../studentImages/${data.image}.jpg">`;
         activeUserId = data.userid
     } catch (error) {
         console.error('Error:', error);
